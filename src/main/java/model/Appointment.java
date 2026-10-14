@@ -10,7 +10,7 @@ public class Appointment {
     private LocalDateTime date;
     private Client client;
     private Invoice invoice;
-    //private final List<Service> services = new ArrayList<>();
+    private final List<Service> services = new ArrayList<>();
     private boolean isArchive = false;
 
     public Appointment(int id, LocalDateTime date, Client client) {
@@ -83,29 +83,29 @@ public class Appointment {
         this.invoice = invoice;
     }
 
-//    public List<Service> getServices() {
-//        return Collections.unmodifiableList(services);
-//    }
+    public List<Service> getServices() {
+        return Collections.unmodifiableList(services);
+    }
 
-//    public boolean addService(Service service) {
-//        if (service == null) {
-//            throw new RuntimeException("Usługa nie może być nullem");
-//        }
-//
-//        if (services.contains(service)) {
-//            return false;
-//        }
-//
-//        return services.add(service);
-//    }
-//
-//    public boolean removeService(Service service) {
-//        if (service == null) {
-//            throw new RuntimeException("Usługa nie może być nullem");
-//        }
-//
-//        return services.remove(service);
-//    }
+    public boolean addService(Service service) {
+        if (service == null) {
+            throw new RuntimeException("Usługa nie może być nullem");
+        }
+
+        if (services.contains(service)) {
+            return false;
+        }
+
+        return services.add(service);
+    }
+
+    public boolean removeService(Service service) {
+        if (service == null) {
+            throw new RuntimeException("Usługa nie może być nullem");
+        }
+
+        return services.remove(service);
+    }
 
     public boolean isArchive() {
         return isArchive;
@@ -115,25 +115,25 @@ public class Appointment {
         isArchive = archive;
     }
 
-//    public int getTotalDurationInMinutes() {
-//        long totalSeconds = 0;
-//
-//        for (Service service : services) {
-//            // Przyjmujemy, że service.getEstimatedTime() zwraca java.time.Duration
-//            totalSeconds += service.getEstimatedTime().getSeconds();
-//        }
-//
-//        return (int) (totalSeconds / 60);
-//    }
+    public int getTotalDurationInMinutes() {
+        long totalSeconds = 0;
 
-//    public String getInfo() {
-//        StringBuilder ss = new StringBuilder();
-//        ss.append("ID: ").append(getId()).append("\n")
-//                .append("Data: ").append(getDate()).append("\n")
-//                .append("Klient: ").append(getClient().getName()).append(" ").append(getClient().getLastName()).append("\n")
-//                .append("Faktura: ").append(getInvoice() != null ? getInvoice().getId() : "Brak").append("\n")
-//                .append("Status: ").append(isArchive() ? "archiwalna" : "aktywna").append("\n");
-//
-//        return ss.toString();
-//    }
+        for (Service service : services) {
+            // Przyjmujemy, że service.getEstimatedTime() zwraca java.time.Duration
+            totalSeconds += service.getEstimatedTime().getSeconds();
+        }
+
+        return (int) (totalSeconds / 60);
+    }
+
+    public String getInfo() {
+        StringBuilder ss = new StringBuilder();
+        ss.append("ID: ").append(getId()).append("\n")
+                .append("Data: ").append(getDate()).append("\n")
+                .append("Klient: ").append(getClient().getName()).append(" ").append(getClient().getLastName()).append("\n")
+                .append("Faktura: ").append(getInvoice() != null ? getInvoice().getId() : "Brak").append("\n")
+                .append("Status: ").append(isArchive() ? "archiwalna" : "aktywna").append("\n");
+
+        return ss.toString();
+    }
 }

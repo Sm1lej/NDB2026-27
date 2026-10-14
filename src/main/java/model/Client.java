@@ -1,16 +1,17 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
     private String name;
     private String lastName;
-    private String pesel;
+    private final String pesel;
     private String email;
     private String phoneNumber;
     private Address address;
     private ClientType clientType;
-    //private ArrayList<Vehicle> vehicles;
+    private ArrayList<Vehicle> vehicles;
     private boolean isArchive = false;
 
     public Client(String name, String lastName, String pesel, String email,
@@ -27,8 +28,6 @@ public class Client {
         if (email.length() > 255)
             throw new RuntimeException("Email przekracza maksymalną długość 255 znaków");
 
-        if (!email.contains("@"))
-            throw new RuntimeException("Niepoprawny format adresu email (brak znaku @)");
 
         for (int i = 0; i < pesel.length(); i++) {
             if (!Character.isDigit(pesel.charAt(i)))
@@ -57,7 +56,7 @@ public class Client {
 
         if (this.address == null)
             throw new RuntimeException("Adres nie może być nullem");
-        clientType = new DefaultClientType();
+        this.clientType = new DefaultClientType();
     }
     public String getPesel() {
         return pesel;
@@ -101,10 +100,10 @@ public class Client {
         return ss.toString();
     }
 
-    // // Klasa Vehicle jeszcze nie istnieje
-    // public List<Vehicle> getVehicles() {
-    //     return vehicles;
-    // }
+
+     public List<Vehicle> getVehicles() {
+         return vehicles;
+     }
 
 
     public void setClientType(ClientType clientType) {
@@ -178,26 +177,26 @@ public class Client {
     }
 
 
-    // public void addVehicle(Vehicle vehicle) {
-    //     if (vehicle == null)
-    //         throw new RuntimeException("Pojazd nie może być nullem");
+     public void addVehicle(Vehicle vehicle) {
+         if (vehicle == null)
+             throw new RuntimeException("Pojazd nie może być nullem");
 
-    //     this.vehicles.add(vehicle);
-    // }
+         this.vehicles.add(vehicle);
+     }
 
 
-//    public void removeVehicle(Vehicle vehicle) {
-//        if (vehicle == null) {
-//            throw new RuntimeException("Pojazd nie może być nullem");
-//        }
-//
-//        // Metoda List.remove(Object) zwraca 'true', jeśli obiekt był na liście i został usunięty.
-//        // Jeśli go nie było, zwraca 'false', więc możemy od razu rzucić wyjątek.
-//        boolean removed = this.vehicles.remove(vehicle);
-//
-//        if (!removed) {
-//            throw new RuntimeException("Nie znaleziono pojazdu u tego klienta");
-//        }
-//    }
+    public void removeVehicle(Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new RuntimeException("Pojazd nie może być nullem");
+        }
+
+        // Metoda List.remove(Object) zwraca 'true', jeśli obiekt był na liście i został usunięty.
+        // Jeśli go nie było, zwraca 'false', więc możemy od razu rzucić wyjątek.
+        boolean removed = this.vehicles.remove(vehicle);
+
+        if (!removed) {
+            throw new RuntimeException("Nie znaleziono pojazdu u tego klienta");
+        }
+    }
 
 }

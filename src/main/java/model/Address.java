@@ -70,8 +70,8 @@ public class Address {
     public String getInfo() {
        StringBuilder sb = new StringBuilder();
        sb.append("Miasto: ").append(getCity())
-               .append("Ulica: ").append(getStreet())
-               .append("Numer: ").append(getNumber());
+               .append(" Ulica: ").append(getStreet())
+               .append(" Numer: ").append(getNumber());
 
        return sb.toString();
     }
