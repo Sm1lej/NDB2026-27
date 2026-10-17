@@ -468,6 +468,28 @@ public class UserInterface {
                     }
                     break;
                 }
+                case 6: {
+                    List<Client> allClients = clientManager.findAll();
+                    List<Client> archivedClients = new ArrayList<>();
+                    for (Client client : allClients) {
+                        if (client != null && client.isArchive()) {
+                            archivedClients.add(client);
+                        }
+                    }
+
+                    if (archivedClients.isEmpty()) {
+                        System.out.println("Brak archiwalnych klientów.\n");
+                        break;
+                    }
+
+                    System.out.println("Archiwalni klienci:\n");
+                    int i = 1;
+                    for (Client client : archivedClients) {
+                        System.out.println(i + ". " + client.getInfo() + "\n");
+                        i++;
+                    }
+                    break;
+                }
                 case 7:
                     break;
                 default:

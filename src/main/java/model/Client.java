@@ -11,7 +11,7 @@ public class Client {
     private String phoneNumber;
     private Address address;
     private ClientType clientType;
-    private ArrayList<Vehicle> vehicles;
+    private ArrayList<Vehicle> vehicles = new ArrayList<>();
     private boolean isArchive = false;
 
     public Client(String name, String lastName, String pesel, String email,
