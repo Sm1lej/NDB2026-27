@@ -1,81 +1,111 @@
+
 package managers;
+
 import java.time.LocalDateTime;
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 
 import model.Appointment;
-import model.Service;
 import repositories.AppointmentRepository;
 
 public class AppointmentScheduler {
-    private WorkingHours workingHours;
-    private AppointmentRepository appointmentRepository;
 
-    /**
-     * Konstruktor klasy AppointmentScheduler, tworzący obiekt harmonogramu z podanymi zależnościami.
-     *
-     * @param workingHours Obiekt określający godziny pracy
-     * @param appointmentRepository Repozytorium wizyt
-     */
-    public AppointmentScheduler(WorkingHours workingHours, AppointmentRepository appointmentRepository) {
-        this.workingHours = workingHours;
-        this.appointmentRepository = appointmentRepository;
+    private final WorkingHours workingHours;
+    private final AppointmentRepository appointmentRepository;
+
+    public AppointmentScheduler(
+            WorkingHours workingHours,
+            AppointmentRepository appointmentRepository) {
+
+        this.workingHours = Objects.requireNonNull(
+                workingHours,
+                "Godziny pracy nie mogą być null."
+        );
+
+        this.appointmentRepository = Objects.requireNonNull(
+                appointmentRepository,
+                "Repozytorium wizyt nie może być null."
+        );
     }
 
-    /**
-     * Sprawdza, czy można zaplanować wizytę w podanym terminie.
-     *
-     * @param startDateTime Data i czas rozpoczęcia wizyty
-     * @param duration Czas trwania wizyty
-     * @return Wartość logiczna wskazująca, czy termin jest dostępny
-     */
-    public boolean canScheduleAppointment(LocalDateTime startDateTime, Duration duration) {
+    public boolean canScheduleAppointment(
+            LocalDateTime startDateTime,
+            Duration duration) {
 
-        // Sprawdzenie, czy wizyta nie rozciąga się na więcej niż jeden dzień
-        if (!startDateTime.plus(duration).toLocalDate().equals(startDateTime.toLocalDate())) {
+        if (startDateTime == null || duration == null) {
+            throw new IllegalArgumentException(
+                    "Data i czas trwania nie mogą być null."
+            );
+        }
+
+        if (duration.isNegative() || duration.isZero()) {
+            throw new IllegalArgumentException(
+                    "Czas trwania wizyty musi być dodatni."
+            );
+        }
+
+        LocalDateTime proposedEnd = startDateTime.plus(duration);
+
+        // Wizyta nie może trwać dłużej niż jeden dzień.
+        if (!proposedEnd.toLocalDate()
+                .equals(startDateTime.toLocalDate())) {
             return false;
         }
 
-        // Konwersja dnia tygodnia z formatu Java (1=Poniedziałek, ..., 7=Niedziela)
-        // na indeks zgodny z enumem WeekDay (Poniedziałek=0, ..., Niedziela=6)
-        int javaDay = startDateTime.getDayOfWeek().getValue();
-        int weekDayIndex = javaDay - 1;
+        int weekDayIndex = startDateTime.getDayOfWeek().getValue() - 1;
 
-        // Sprawdzenie, czy podany dzień jest dniem roboczym
+        // Sprawdzenie dnia roboczego.
         if (!workingHours.isWorkingDay(weekDayIndex)) {
             return false;
         }
 
-        // Pobranie czasu rozpoczęcia i zakończenia wizyty oraz sprawdzenie, czy mieszczą się w godzinach pracy
-        var startTime = startDateTime.toLocalTime();
-        var endTime = startDateTime.plus(duration).toLocalTime();
-        if (startTime.isBefore(workingHours.getStartTime()) || endTime.isAfter(workingHours.getEndTime())) {
+        // Sprawdzenie godzin pracy.
+        if (startDateTime.toLocalTime()
+                .isBefore(workingHours.getStartTime())
+                || proposedEnd.toLocalTime()
+                .isAfter(workingHours.getEndTime())) {
             return false;
         }
 
-        // Obliczenie proponowanego końca wizyty
-        LocalDateTime proposedEnd = startDateTime.plus(duration);
-        List<Appointment> overlappingAppointments = appointmentRepository.findBy(app -> {
-            // Pobranie czasu rozpoczęcia wizyty
-            LocalDateTime appStart = app.getDate();
+        // Pobieramy wizyty z tego samego dnia.
+        LocalDateTime dayStart = startDateTime
+                .toLocalDate()
+                .atStartOfDay();
 
-            // Obliczenie całkowitego czasu trwania wizyty poprzez sumowanie czasów usług
-            long totalSeconds = 0;
-            for (Service service : app.getServices()) {
-                // Pobranie szacowanego czasu trwania usługi jako Duration
-                Duration timePeriod = service.getEstimatedTime();
-                // Dodanie czasu trwania tej usługi (w sekundach) do łącznego czasu
-                totalSeconds += timePeriod.getSeconds();
+        LocalDateTime nextDayStart = dayStart.plusDays(1);
+
+        List<Appointment> appointments =
+                appointmentRepository.findByDateRange(
+                        dayStart,
+                        nextDayStart
+                );
+
+        // Sprawdzamy kolizje terminów.
+        for (Appointment appointment : appointments) {
+
+            if (appointment.isArchive()) {
+                continue;
             }
-            // Konwersja łącznego czasu na Duration
-            Duration appDuration = Duration.ofSeconds(totalSeconds);
-            // Obliczenie końca wizyty
-            LocalDateTime appEnd = appStart.plus(appDuration);
-            // Sprawdzenie, czy istnieje nakład czasowy z proponowaną wizytą która jest aktualna/niearchiwalna
-            return appStart.isBefore(proposedEnd) && startDateTime.isBefore(appEnd) && !app.isArchive();
-        });
 
-        // Zwrócenie true, jeśli nie ma nakładających się wizyt
-        return overlappingAppointments.isEmpty();
+            LocalDateTime existingStart = appointment.getDate();
+
+            Duration existingDuration = Duration.ofMinutes(
+                    appointment.getTotalDurationInMinutes()
+            );
+
+            LocalDateTime existingEnd =
+                    existingStart.plus(existingDuration);
+
+            boolean overlaps =
+                    existingStart.isBefore(proposedEnd)
+                            && startDateTime.isBefore(existingEnd);
+
+            if (overlaps) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

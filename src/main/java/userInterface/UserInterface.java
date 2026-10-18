@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import managers.ClientManager;
@@ -55,7 +56,6 @@ public class UserInterface {
                 case 2: handleVehicleOperations(); break;
                 case 3: handleServiceOperations(); break;
                 case 4: handleAppointmentOperations(); break;
-                case 5: generateReports(); break;
                 case 0: System.out.println("Zamykanie aplikacji...\n"); break;
                 default: System.out.println("Nieprawidłowy wybór!\n");
             }
@@ -455,17 +455,14 @@ public class UserInterface {
                         pesel = scanner.nextLine();
                     } while (!isValidPesel(pesel));
 
-                    List<Client> found = clientManager.findByPesel(pesel);
+                    Optional<Client> found = clientManager.findByPesel(pesel);
                     if (found.isEmpty()){
                         System.out.println("Nieznaleziono klienta\n");
                         break;
                     }
+                    Client client = found.get();
                     System.out.println("Klient o podanym numerze pesel: " + pesel + " :\n");
-                    for (Client client : found) {
-                        if (client != null) {
-                            System.out.println(client.getInfo() + '\n');
-                        }
-                    }
+                    System.out.println(client.getInfo() + '\n');
                     break;
                 }
                 case 6: {
@@ -506,7 +503,7 @@ public class UserInterface {
             pesel = scanner.nextLine();
         } while(!isValidPesel(pesel));
 
-        List<Client> clients = clientManager.findByPesel(pesel);
+        Optional<Client> clients = clientManager.findByPesel(pesel);
         if(clients.isEmpty()) {
             System.out.println("Nie znaleziono klienta.\n");
             return;
@@ -530,7 +527,7 @@ public class UserInterface {
         System.out.println("Klienci:\n");
         for(Client client : clients) {
             if (client.isArchive())
-            continue;
+                continue;
             System.out.println(client.getInfo() + "\n");
         }
     }
@@ -556,14 +553,13 @@ public class UserInterface {
                         pesel = scanner.nextLine();
                     } while (!isValidPesel(pesel));
 
-                    List<Client> found = clientManager.findByPesel(pesel);
+                    Optional<Client> found = clientManager.findByPesel(pesel);
                     if (found.isEmpty()){
                         System.out.println("Nieznaleziono klienta\n");
                         break;
                     }
 
-                    ClientType defaultType = new DefaultClientType();
-                    found.get(0).setClientType(defaultType);
+                    clientManager.changeClientType(pesel, new DefaultClientType());
                     System.out.println("Domyślny typ klienta ustawiony pomyślnie\n");
                     break;
                 }
@@ -574,14 +570,13 @@ public class UserInterface {
                         pesel = scanner.nextLine();
                     } while (!isValidPesel(pesel));
 
-                    List<Client> found = clientManager.findByPesel(pesel);
+                    Optional<Client> found = clientManager.findByPesel(pesel);
                     if (found.isEmpty()){
                         System.out.println("Nieznaleziono klienta\n");
                         break;
                     }
 
-                    ClientType gold = new GoldClientType();
-                    found.get(0).setClientType(gold);
+                    clientManager.changeClientType(pesel, new GoldClientType());
                     System.out.println("Złoty typ klienta ustawiony pomyślnie\n");
                     break;
                 }
@@ -592,14 +587,13 @@ public class UserInterface {
                         pesel = scanner.nextLine();
                     } while (!isValidPesel(pesel));
 
-                    List<Client> found = clientManager.findByPesel(pesel);
+                    Optional<Client> found = clientManager.findByPesel(pesel);
                     if (found.isEmpty()){
                         System.out.println("Nieznaleziono klienta\n");
                         break;
                     }
 
-                    ClientType diamond = new DiamondClientType();
-                    found.get(0).setClientType(diamond);
+                    clientManager.changeClientType(pesel, new DiamondClientType());
                     System.out.println("Diamentowy typ klienta ustawiony pomyślnie\n");
                     break;
                 }
@@ -1051,9 +1045,9 @@ public class UserInterface {
         fixBrake = fixBrakeStr.equals("t");
 
         try {
-            serviceManager.registerRepairService(serviceManager.findAll().size() + 1, description, basePrice,
+            Service saved = serviceManager.registerRepairService(description, basePrice,
                     duration, changeTires, fillFluids, fixBrake);
-            System.out.println("Usługa naprawcza zarejestrowana pomyślnie!\n");
+            System.out.println("Usługa naprawcza zarejestrowana pomyślnie! ID: " + saved.getId() + "\n");
         } catch (RuntimeException e) {
             System.err.println("Błąd: " + e.getMessage() + "\n");
         }
@@ -1116,9 +1110,9 @@ public class UserInterface {
         checkFluids = checkFluidsStr.equals("t");
 
         try {
-            serviceManager.registerDiagnosticService(serviceManager.findAll().size() + 1, description, basePrice,
+            Service saved = serviceManager.registerDiagnosticService(description, basePrice,
                     duration, checkTires, checkFluids, checkBrake);
-            System.out.println("Usługa diagnostyczna zarejestrowana pomyślnie!\n");
+            System.out.println("Usługa diagnostyczna zarejestrowana pomyślnie! ID: " + saved.getId() + "\n");
         } catch (RuntimeException e) {
             System.err.println("Błąd: " + e.getMessage() + "\n");
         }
@@ -1134,16 +1128,13 @@ public class UserInterface {
         } while(!isPositiveNumber(idStr));
         id = Integer.parseInt(idStr);
 
-        List<Service> services = serviceManager.findById(id);
-        if(services.isEmpty()) {
+        Optional<Service> service = serviceManager.findById(id);
+        if(service.isEmpty()) {
             System.out.println("Nie znaleziono usługi.\n");
             return;
         }
 
-        System.out.println("Usługi:\n");
-        for(Service service : services) {
-            System.out.println(service.getInfo() + "\n");
-        }
+        System.out.println("Usługa:\n" + service.get().getInfo() + "\n");
     }
 
     public void removeService() {
@@ -1156,14 +1147,14 @@ public class UserInterface {
         } while(!isPositiveNumber(idStr));
         id = Integer.parseInt(idStr);
 
-        List<Service> services = serviceManager.findById(id);
-        if(services.isEmpty()) {
+        Optional<Service> service = serviceManager.findById(id);
+        if(service.isEmpty()) {
             System.out.println("Nie znaleziono usługi.\n");
             return;
         }
 
         try {
-            serviceManager.unregisterService(services.get(0));
+            serviceManager.unregisterService(service.get());
             System.out.println("Usługa została usunięta.\n");
         } catch (RuntimeException e) {
             System.err.println("Błąd: " + e.getMessage() + "\n");
@@ -1227,10 +1218,8 @@ public class UserInterface {
             idStr = idStr.trim();
             if(isPositiveNumber(idStr)) {
                 int id = Integer.parseInt(idStr);
-                List<Service> foundServices = serviceManager.findById(id);
-                if(!foundServices.isEmpty()) {
-                    services.add(foundServices.get(0));
-                }
+                Optional<Service> foundService = serviceManager.findById(id);
+                foundService.ifPresent(services::add);
             }
         }
 
@@ -1240,8 +1229,8 @@ public class UserInterface {
         }
 
         try {
-            appointmentManager.registerAppointment(services, dateTime, clientPesel);
-            System.out.println("Wizyta umówiona pomyślnie!\n");
+            Appointment saved = appointmentManager.registerAppointment(services, dateTime, clientPesel);
+            System.out.println("Wizyta umówiona pomyślnie! ID: " + saved.getId() + "\n");
         } catch (RuntimeException e) {
             System.err.println("Błąd: " + e.getMessage() + "\n");
         }
@@ -1254,13 +1243,13 @@ public class UserInterface {
             pesel = scanner.nextLine();
         } while(!isValidPesel(pesel));
 
-        List<Client> clients = clientManager.findByPesel(pesel);
+        Optional<Client> clients = clientManager.findByPesel(pesel);
         if(clients.isEmpty()) {
             System.out.println("Nie znaleziono klienta.\n");
             return;
         }
 
-        List<Appointment> appointments = appointmentManager.findByClientPesel(clients.get(0).getPesel());
+        List<Appointment> appointments = appointmentManager.findByClientPesel(clients.get().getPesel());
         if(appointments.isEmpty()) {
             System.out.println("Brak wizyt dla tego klienta.\n");
             return;
@@ -1268,8 +1257,8 @@ public class UserInterface {
 
         for(Appointment appointment : appointments) {
             System.out.println("ID: " + appointment.getId()
-            + ", Data: " + appointment.getDate()
-            + ", Klient: " + appointment.getClient().getName() + " " + appointment.getClient().getLastName() + "\n");
+                    + ", Data: " + appointment.getDate()
+                    + ", Klient: " + appointment.getClient().getName() + " " + appointment.getClient().getLastName() + "\n");
         }
     }
 
@@ -1283,14 +1272,14 @@ public class UserInterface {
         } while(!isPositiveNumber(idStr));
         id = Integer.parseInt(idStr);
 
-        List<Appointment> appointments = appointmentManager.findById(id);
-        if(appointments.isEmpty()) {
+        Optional<Appointment> appointment = appointmentManager.findById(id);
+        if(appointment.isEmpty()) {
             System.out.println("Nie znaleziono wizyty.\n");
             return;
         }
 
         try {
-            appointmentManager.cancelAppointment(appointments.get(0));
+            appointmentManager.cancelAppointment(appointment.get());
             System.out.println("Wizyta anulowana pomyślnie.\n");
         } catch (RuntimeException e) {
             System.err.println("Błąd: " + e.getMessage() + "\n");
@@ -1307,34 +1296,18 @@ public class UserInterface {
         } while(!isPositiveNumber(idStr));
         id = Integer.parseInt(idStr);
 
-        List<Appointment> appointments = appointmentManager.findById(id);
-        if(appointments.isEmpty()) {
+        Optional<Appointment> appointment = appointmentManager.findById(id);
+        if(appointment.isEmpty()) {
             System.out.println("Nie znaleziono wizyty.\n");
             return;
         }
 
         try {
-            appointmentManager.unregisterAppointment(appointments.get(0));
+            appointmentManager.unregisterAppointment(appointment.get());
             System.out.println("Wizyta zarchiwizowana pomyślnie.\n");
         } catch (RuntimeException e) {
             System.err.println("Błąd: " + e.getMessage() + "\n");
         }
-    }
-
-    public void generateReports() {
-        System.out.println("\n--- RAPORTY ---\n");
-
-        System.out.println("\nKlienci:\n");
-        System.out.println(clientManager.report());
-
-        System.out.println("\nPojazdy:\n");
-        System.out.println(vehicleManager.report());
-
-        System.out.println("\nUslugi:\n");
-        System.out.println(serviceManager.report());
-
-        System.out.println("\nWizyty:\n");
-        System.out.println(appointmentManager.report());
     }
 
     public void displayMainMenu() {
@@ -1343,7 +1316,6 @@ public class UserInterface {
         System.out.println("2. Zarządzanie pojazdami");
         System.out.println("3. Zarządzanie usługami");
         System.out.println("4. Zarządzanie wizytami");
-        System.out.println("5. Raporty");
         System.out.println("0. Wyjście");
         System.out.println("Wybierz opcje:");
     }

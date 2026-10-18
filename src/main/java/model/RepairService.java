@@ -15,13 +15,19 @@ public class RepairService extends Service {
     /**
      * Konstruktor klasy RepairService, tworzący obiekt usługi naprawy o wskazanych parametrach.
      */
-    public RepairService(int id, String description, double basePrice, Duration estimatedDurationTime,
+    public RepairService(String description, double basePrice, Duration estimatedDurationTime,
                          boolean changeTires, boolean fillFluids, boolean fixBrakeSystem) {
 
-        super(id, description, basePrice, estimatedDurationTime);
+        super(description, basePrice, estimatedDurationTime);
         this.changeTires = changeTires;
         this.fillFluids = fillFluids;
         this.fixBrakeSystem = fixBrakeSystem;
+    }
+
+    public RepairService(Integer id, String description, double basePrice, Duration estimatedDurationTime,
+                         boolean changeTires, boolean fillFluids, boolean fixBrakeSystem){
+        this(description, basePrice, estimatedDurationTime, changeTires, fillFluids, fixBrakeSystem);
+        super.setId(id);
     }
 
     public boolean isChangeTires() {

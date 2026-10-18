@@ -15,13 +15,19 @@ public class DiagnosticService extends Service {
     /**
      * Konstruktor klasy DiagnosticService, tworzący obiekt usługi diagnostycznej o wskazanych parametrach.
      */
-    public DiagnosticService(int id, String description, double basePrice, Duration estimatedDurationTime,
+    public DiagnosticService(String description, double basePrice, Duration estimatedDurationTime,
                              boolean checkTires, boolean checkFluids, boolean checkBrake) {
 
-        super(id, description, basePrice, estimatedDurationTime);
+        super(description, basePrice, estimatedDurationTime);
         this.checkTires = checkTires;
         this.checkFluids = checkFluids;
         this.checkBrake = checkBrake;
+    }
+
+    public DiagnosticService(Integer id, String description, double basePrice, Duration estimatedDurationTime,
+                         boolean checkTires, boolean checkFluids, boolean checkBrake){
+        this(description, basePrice, estimatedDurationTime, checkTires, checkFluids, checkBrake);
+        super.setId(id);
     }
 
     public boolean isCheckTires() {

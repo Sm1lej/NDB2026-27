@@ -2,24 +2,34 @@ package model;
 
 public class Invoice {
 
-    private final int id;
+    private Integer id;
     private final Appointment appointment;
     private boolean isPaid = false;
 
-    public Invoice(int id, Appointment appointment) {
-        if (id <= 0) {
-            throw new RuntimeException("Identyfikator faktury musi być większy od zera");
-        }
+    public Invoice(Appointment appointment) {
         if (appointment == null) {
             throw new RuntimeException("Wizyta nie może być nullem");
         }
 
-        this.id = id;
         this.appointment = appointment;
+    }
+
+    public Invoice(Integer id, Appointment appointment) {
+        this(appointment);
+        setId(id);
     }
 
     public int getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException(
+                    "Identyfikator faktury musi być większy od zera"
+            );
+        }
+        this.id = id;
     }
 
     public Appointment getAppointment() {
@@ -30,18 +40,18 @@ public class Invoice {
         return isPaid;
     }
 
-//    public double calculateTotalCost() {
-//        double totalCost = 0.0;
-//
-//        if (appointment != null && appointment.getServices() != null) {
-//            for (Service service : appointment.getServices()) {
-//                double basePrice = service.getPriceForClient();
-//                totalCost += appointment.getClient().getClientType().applyDiscount(basePrice);
-//            }
-//        }
-//
-//        return totalCost;
-//    }
+    public double calculateTotalCost() {
+        double totalCost = 0.0;
+
+        if (appointment != null && appointment.getServices() != null) {
+            for (Service service : appointment.getServices()) {
+                double basePrice = service.getPriceForClient();
+                totalCost += appointment.getClient().getClientType().applyDiscount(basePrice);
+            }
+        }
+
+        return totalCost;
+    }
 
     public void markAsPaid() {
         if (isPaid) {

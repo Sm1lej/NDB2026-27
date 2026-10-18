@@ -9,110 +9,64 @@ import model.Car;
 import model.Motorbike;
 
 public class VehicleManager {
-    private VehicleRepository vehicleRepository;
-    private ClientRepository clientRepository;
+    private final VehicleRepository vehicleRepository;
+    private final ClientRepository clientRepository;
 
-    /**
-     * Konstruktor klasy VehicleManager, tworzący obiekt menedżera z podanymi zależnościami.
-     *
-     * @param vehicleRepository Repozytorium pojazdów
-     * @param clientRepository Repozytorium klientów
-     */
     public VehicleManager(VehicleRepository vehicleRepository, ClientRepository clientRepository) {
-        if (vehicleRepository == null) {
-            throw new RuntimeException("Nieprawidłowe repozytorium pojazdów.");
-        }
-        if (clientRepository == null) {
-            throw new RuntimeException("Nieprawidłowe repozytorium klientów.");
+        if (vehicleRepository == null || clientRepository == null) {
+            throw new IllegalArgumentException("Repozytoria nie mogą być null.");
         }
         this.vehicleRepository = vehicleRepository;
         this.clientRepository = clientRepository;
     }
 
-    /**
-     * Rejestruje nowy samochód w systemie.
-     */
-    public void registerCar(String ownerPesel, String vinNumber, String registrationNumber, int yearOfProduction,
-                            String brand, String model, String color, int engineDisplacement, int enginePower,
-                            int weight, String bodyType, String fuelType, int doorsCount) {
+    public Car registerCar(String ownerPesel, String vinNumber, String registrationNumber,
+                           int yearOfProduction, String brand, String model, String color,
+                           int engineDisplacement, int enginePower, int weight, String bodyType,
+                           String fuelType, int doorsCount) {
+        Client client = getExistingClient(ownerPesel);
+        validateUniqueVehicle(vinNumber, registrationNumber);
 
-        List<Client> existingClients = clientRepository.findByPesel(ownerPesel);
-        if (existingClients.isEmpty()) {
-            throw new RuntimeException("Nie znaleziono klienta o podanym numerze PESEL.");
+        Car car = new Car(client, vinNumber, registrationNumber, yearOfProduction,
+                brand, model, color, engineDisplacement, enginePower, weight,
+                bodyType, fuelType, doorsCount);
+        return (Car) vehicleRepository.save(car);
+    }
+
+    public Motorbike registerMotorBike(String ownerPesel, String vinNumber,
+                                       String registrationNumber, int yearOfProduction, String brand,
+                                       String model, String color, int engineDisplacement, int enginePower,
+                                       int weight, String brakeSystem) {
+        Client client = getExistingClient(ownerPesel);
+        validateUniqueVehicle(vinNumber, registrationNumber);
+
+        Motorbike motorBike = new Motorbike(client, vinNumber, registrationNumber,
+                yearOfProduction, brand, model, color, engineDisplacement,
+                enginePower, weight, brakeSystem);
+        return (Motorbike) vehicleRepository.save(motorBike);
+    }
+
+    private Client getExistingClient(String pesel) {
+        return clientRepository.findById(pesel)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Nie znaleziono klienta o podanym numerze PESEL."));
+    }
+
+    private void validateUniqueVehicle(String vinNumber, String registrationNumber) {
+        if (!vehicleRepository.findByVinNumber(vinNumber).isEmpty()) {
+            throw new IllegalArgumentException("Pojazd o podanym numerze VIN już istnieje.");
         }
-
-        List<Vehicle> existingVehiclesVin = vehicleRepository.findByVinNumber(vinNumber);
-        if (!existingVehiclesVin.isEmpty()) {
-            throw new RuntimeException("Pojazd o podanym numerze VIN już istnieje.");
-        }
-
-        List<Vehicle> existingVehiclesRegistrationNumber = vehicleRepository.findByRegistrationNumber(registrationNumber);
-        if (!existingVehiclesRegistrationNumber.isEmpty()) {
-            throw new RuntimeException("Pojazd o podanym numerze rejestracyjnym już istnieje.");
-        }
-
-        Client client = existingClients.get(0);
-
-        try {
-            Vehicle car = new Car(client, vinNumber, registrationNumber, yearOfProduction, brand, model,
-                    color, engineDisplacement, enginePower, weight, bodyType, fuelType, doorsCount);
-
-            vehicleRepository.addElement(car);
-            client.addVehicle(car);
-        } catch (RuntimeException e) {
-            throw e;
+        if (!vehicleRepository.findByRegistrationNumber(registrationNumber).isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Pojazd o podanym numerze rejestracyjnym już istnieje.");
         }
     }
 
-    /**
-     * Rejestruje nowy motocykl w systemie.
-     */
-    public void registerMotorBike(String ownerPesel, String vinNumber, String registrationNumber, int yearOfProduction,
-                                  String brand, String model, String color, int engineDisplacement, int enginePower,
-                                  int weight, String brakeSystem) {
-
-        List<Client> existingClients = clientRepository.findByPesel(ownerPesel);
-        if (existingClients.isEmpty()) {
-            throw new RuntimeException("Nie znaleziono klienta o podanym numerze PESEL.");
-        }
-
-        List<Vehicle> existingVehiclesVin = vehicleRepository.findByVinNumber(vinNumber);
-        if (!existingVehiclesVin.isEmpty()) {
-            throw new RuntimeException("Pojazd o podanym numerze VIN już istnieje.");
-        }
-
-        List<Vehicle> existingVehiclesRegistrationNumber = vehicleRepository.findByRegistrationNumber(registrationNumber);
-        if (!existingVehiclesRegistrationNumber.isEmpty()) {
-            throw new RuntimeException("Pojazd o podanym numerze rejestracyjnym już istnieje.");
-        }
-
-        Client client = existingClients.get(0);
-
-        try {
-            Vehicle motorBike = new Motorbike(client, vinNumber, registrationNumber, yearOfProduction, brand,
-                    model, color, engineDisplacement, enginePower, weight, brakeSystem);
-
-            vehicleRepository.addElement(motorBike);
-            client.addVehicle(motorBike);
-        } catch (RuntimeException e) {
-            throw e;
-        }
-    }
-
-    /**
-     * Usuwa pojazd z repozytorium na podstawie numeru VIN.
-     */
     public void unregisterVehicle(String vinNumber) {
-        List<Vehicle> existingVehiclesVin = vehicleRepository.findByVinNumber(vinNumber);
-        if (existingVehiclesVin.isEmpty()) {
-            throw new RuntimeException("Nie znaleziono pojazdu o podanym numerze VIN.");
+        if (vehicleRepository.findByVinNumber(vinNumber).isEmpty()) {
+            throw new IllegalArgumentException("Nie znaleziono pojazdu o podanym numerze VIN.");
         }
-
-        if (existingVehiclesVin.get(0) == null) {
-            throw new RuntimeException("Nieprawidłowy obiekt pojazdu.");
-        }
-
-        vehicleRepository.removeElement(existingVehiclesVin.get(0));
+        vehicleRepository.deleteById(vinNumber);
     }
 
     public List<Vehicle> findByClientPesel(String clientPesel) {
@@ -137,9 +91,5 @@ public class VehicleManager {
 
     public List<Vehicle> findAll() {
         return vehicleRepository.findAll();
-    }
-
-    public String report() {
-        return vehicleRepository.report();
     }
 }

@@ -6,39 +6,29 @@ import java.util.List;
 
 public class Appointment {
 
-    private int id;
+    private Integer id;
     private LocalDateTime date;
     private Client client;
     private Invoice invoice;
     private final List<Service> services = new ArrayList<>();
     private boolean isArchive = false;
 
-    public Appointment(int id, LocalDateTime date, Client client) {
-        if (id <= 0) {
-            throw new RuntimeException("Identyfikator wizyty musi być większy od zera");
-        }
-        if (date == null) {
-            throw new RuntimeException("Data wizyty nie może być nullem");
-        }
-        if (date.isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Data wizyty nie może być w przeszłości");
-        }
-        if (client == null) {
-            throw new RuntimeException("Klient nie może być nullem");
-        }
-
-        this.id = id;
-        this.date = date;
-        this.client = client;
+    public Appointment(LocalDateTime date, Client client) {
+        setDate(date);
+        setClient(client);
     }
 
+    public Appointment(Integer id, LocalDateTime date, Client client) {
+        this(date, client);
+        setId(id);
+    }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
-        if (id <= 0) {
+    public void setId(Integer id) {
+        if (id == null || id <= 0) {
             throw new RuntimeException("Identyfikator wizyty musi być większy od zera");
         }
         this.id = id;

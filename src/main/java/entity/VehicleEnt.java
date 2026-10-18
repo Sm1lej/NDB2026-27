@@ -8,10 +8,6 @@ import jakarta.persistence.*;
 public abstract class VehicleEnt {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
     private String vinNumber;
 
     private String registrationNumber;
@@ -25,8 +21,7 @@ public abstract class VehicleEnt {
 
     public VehicleEnt() {}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+
     public String getVinNumber() { return vinNumber; }
     public void setVinNumber(String vinNumber) { this.vinNumber = vinNumber; }
     public ClientEnt getOwner() { return owner; }

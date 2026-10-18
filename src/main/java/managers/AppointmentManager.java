@@ -1,182 +1,154 @@
 package managers;
+
 import model.Appointment;
+import model.Client;
+import model.Invoice;
 import model.Service;
 import repositories.AppointmentRepository;
 import repositories.ClientRepository;
-import model.Client;
-import model.Invoice;
-import java.time.LocalDateTime;
+
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class AppointmentManager {
-    private AppointmentScheduler appointmentScheduler;
-    private AppointmentRepository appointmentRepository;
-    private ClientRepository clientRepository;
 
-    /**
-     * Konstruktor klasy AppointmentManager, tworzący obiekt menedżera z podanymi zależnościami.
-     *
-     * @param appointmentRepository Repozytorium wizyt
-     * @param appointmentScheduler Harmonogram wizyt
-     * @param clientRepository Repozytorium klientów
-     */
-    public AppointmentManager(AppointmentRepository appointmentRepository,
-                              AppointmentScheduler appointmentScheduler,
-                              ClientRepository clientRepository) {
-        if (appointmentRepository == null) {
-            throw new RuntimeException("Nieprawidłowe repozytorium wizyt.");
-        }
-        if (appointmentScheduler == null) {
-            throw new RuntimeException("Nieprawidłowy harmonogram.");
-        }
-        if (clientRepository == null) {
-            throw new RuntimeException("Nieprawidłowe repozytorium klientów.");
-        }
+    private final AppointmentScheduler appointmentScheduler;
+    private final AppointmentRepository appointmentRepository;
+    private final ClientRepository clientRepository;
 
-        this.appointmentRepository = appointmentRepository;
-        this.appointmentScheduler = appointmentScheduler;
-        this.clientRepository = clientRepository;
+    public AppointmentManager(
+            AppointmentRepository appointmentRepository,
+            AppointmentScheduler appointmentScheduler,
+            ClientRepository clientRepository) {
+
+        this.appointmentRepository = Objects.requireNonNull(
+                appointmentRepository,
+                "Nieprawidłowe repozytorium wizyt."
+        );
+
+        this.appointmentScheduler = Objects.requireNonNull(
+                appointmentScheduler,
+                "Nieprawidłowy harmonogram."
+        );
+
+        this.clientRepository = Objects.requireNonNull(
+                clientRepository,
+                "Nieprawidłowe repozytorium klientów."
+        );
     }
 
-    /**
-     * Rejestruje nową wizytę z podanymi usługami, datą i numerem PESEL klienta.
-     *
-     * @param services Lista usług
-     * @param date Data i czas wizyty
-     * @param clientPesel Numer PESEL klienta
-     */
-    public void registerAppointment(List<Service> services, LocalDateTime date, String clientPesel) {
+    public Appointment registerAppointment(
+            List<Service> services,
+            LocalDateTime date,
+            String clientPesel) {
+
         if (services == null || services.isEmpty()) {
-            throw new RuntimeException("Lista usług jest pusta.");
+            throw new IllegalArgumentException(
+                    "Lista usług jest pusta."
+            );
         }
 
-        List<Client> existingClients = clientRepository.findByPesel(clientPesel);
-        if (existingClients.isEmpty()) {
-            throw new RuntimeException("Nie znaleziono klienta o podanym numerze PESEL.");
+        if (date == null) {
+            throw new IllegalArgumentException(
+                    "Data wizyty nie może być null."
+            );
         }
 
-        long totalSeconds = 0;
+        if (clientPesel == null || clientPesel.isBlank()) {
+            throw new IllegalArgumentException(
+                    "PESEL klienta nie może być pusty."
+            );
+        }
+
+        Client client = clientRepository.findById(clientPesel)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Nie znaleziono klienta o podanym numerze PESEL."
+                ));
+
+        Duration duration = Duration.ZERO;
+
         for (Service service : services) {
-            if (service != null) {
-                Duration timePeriod = service.getEstimatedTime();
-                totalSeconds += timePeriod.getSeconds();
+            if (service == null) {
+                throw new IllegalArgumentException(
+                        "Usługa nie może być null."
+                );
             }
+
+            duration = duration.plus(service.getEstimatedTime());
         }
-        Duration duration = Duration.ofSeconds(totalSeconds);
 
         if (!appointmentScheduler.canScheduleAppointment(date, duration)) {
-            throw new RuntimeException("Nie można zaplanować wizyty w podanym terminie.");
+            throw new IllegalStateException(
+                    "Nie można zaplanować wizyty w podanym terminie."
+            );
         }
 
-        int newId = appointmentRepository.getSize() + 1;
+        Appointment appointment = new Appointment(date, client);
 
-        try {
-            Appointment appointment = new Appointment(newId, date, existingClients.get(0));
-
-            for (Service service : services) {
-                appointment.addService(service);
-            }
-
-            Invoice invoice = new Invoice(newId, appointment);
-            appointment.addInvoice(invoice);
-
-            appointmentRepository.addElement(appointment);
-        } catch (RuntimeException e) {
-            throw e;
+        for (Service service : services) {
+            appointment.addService(service);
         }
+
+        Invoice invoice = new Invoice(appointment);
+        appointment.addInvoice(invoice);
+
+        return appointmentRepository.save(appointment);
     }
 
-    /**
-     * Wypisuje wizytę z systemu, zachowując jej dane.
-     *
-     * @param appointment Wizyta do wypisania
-     */
     public void unregisterAppointment(Appointment appointment) {
-        if (appointment == null) {
-            throw new RuntimeException("Wizyta nie może być null.");
-        }
 
-        List<Appointment> existingAppointments = findByClientPesel(appointment.getClient().getPesel());
-        if (existingAppointments.isEmpty()) {
-            throw new RuntimeException("Nie znaleziono wizyty dla podanego klienta.");
-        }
+        Appointment existingAppointment =
+                getExistingAppointment(appointment);
 
-        existingAppointments.get(0).setArchive(true);
+        existingAppointment.setArchive(true);
+
+        appointmentRepository.save(existingAppointment);
     }
 
-    /**
-     * Anuluje wizytę, usuwając ją z harmonogramu.
-     *
-     * @param appointment Wizyta do anulowania
-     */
     public void cancelAppointment(Appointment appointment) {
-        if (appointment == null) {
-            throw new RuntimeException("Wizyta nie może być null.");
-        }
 
-        List<Appointment> existingAppointments = findByClientPesel(appointment.getClient().getPesel());
-        if (existingAppointments.isEmpty()) {
-            throw new RuntimeException("Nie znaleziono wizyty dla podanego klienta.");
-        }
+        Appointment existingAppointment =
+                getExistingAppointment(appointment);
 
-        appointmentRepository.removeElement(appointment);
+        appointmentRepository.deleteById(existingAppointment.getId());
     }
 
-    /**
-     * Wyszukuje wizyty powiązane z określonym klientem.
-     *
-     * @param clientPesel Numer PESEL klienta
-     * @return Lista wizyt powiązanych z klientem
-     */
+    private Appointment getExistingAppointment(Appointment appointment) {
+
+        if (appointment == null || appointment.getId() == null) {
+            throw new IllegalArgumentException(
+                    "Wizyta musi posiadać identyfikator."
+            );
+        }
+
+        return appointmentRepository.findById(appointment.getId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Nie znaleziono wizyty o ID: " + appointment.getId()
+                ));
+    }
+
     public List<Appointment> findByClientPesel(String clientPesel) {
         return appointmentRepository.findByClientPesel(clientPesel);
     }
 
-    /**
-     * Wyszukuje wizyty odbywające się w określonym dniu.
-     *
-     * @param date Data, dla której wyszukiwane są wizyty
-     * @return Lista wizyt z podanej daty
-     */
     public List<Appointment> findByDate(LocalDateTime date) {
         return appointmentRepository.findByDate(date);
     }
 
-    /**
-     * Wyszukuje wizyty na podstawie identyfikatora.
-     *
-     * @param id Identyfikator wizyty
-     * @return Lista wizyt o podanym identyfikatorze
-     */
-    public List<Appointment> findById(int id) {
+    public Optional<Appointment> findById(Integer id) {
         return appointmentRepository.findById(id);
     }
 
-    /**
-     * Wyszukuje zarchiwizowane wizyty.
-     *
-     * @return Lista zarchiwizowanych wizyt
-     */
     public List<Appointment> findByArchive() {
         return appointmentRepository.findByArchive();
     }
 
-    /**
-     * Zwraca wszystkie zarejestrowane wizyty.
-     *
-     * @return Lista wszystkich wizyt
-     */
     public List<Appointment> findAll() {
         return appointmentRepository.findAll();
-    }
-
-    /**
-     * Generuje raport dotyczący wizyt.
-     *
-     * @return Tekstowa reprezentacja danych raportu
-     */
-    public String report() {
-        return appointmentRepository.report();
     }
 }

@@ -1,12 +1,15 @@
 package managers;
 
+import model.Appointment;
+import model.ClientType;
 import repositories.ClientRepository;
 import model.Client;
 import model.Address;
 import java.util.List;
+import java.util.Optional;
 
 public class ClientManager {
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
     /**
      * Konstruktor klasy ClientManager, tworzący obiekt menedżera z podanym repozytorium.
@@ -32,31 +35,30 @@ public class ClientManager {
      * @param street Ulica zamieszkania klienta
      * @param number Numer domu/mieszkania klienta
      */
-    public void registerClient(String name, String lastName, String email,
-                               String phoneNumber, String pesel,
-                               String city, String street, String number) {
+    public Client registerClient(String name, String lastName, String pesel,
+                                 String email, String phoneNumber,
+                                 String city, String street, String number) {
 
-        // Przeszukujemy repo klientów, sprawdzamy czy klient z podanym peselem znajduje się już w repozytorium
-        List<Client> existingClients = clientRepository.findByPesel(pesel);
-        if (!existingClients.isEmpty()) {
-            throw new RuntimeException("Klient o podanym numerze PESEL już istnieje w repozytorium.");
+        if (clientRepository.findById(pesel).isPresent()) {
+            throw new IllegalArgumentException(
+                    "Klient o podanym numerze PESEL już istnieje."
+            );
         }
 
-        // Tworzenie adresu
-        Address address;
-        try {
-            address = new Address(city, street, number);
-        } catch (RuntimeException e) {
-            throw e;
-        }
+        Address address = new Address(city, street, number);
+        Client client = new Client(
+                name, lastName, pesel, email, phoneNumber, address
+        );
 
-        // Tworzenie klienta
-        try {
-            Client client = new Client(name, lastName, email, phoneNumber, pesel, address);
-            clientRepository.addElement(client);
-        } catch (RuntimeException e) {
-            throw e;
-        }
+        return clientRepository.save(client);
+    }
+
+    private Client getExistingClient(String pesel) {
+
+        return clientRepository.findById(pesel)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Nie znaleziono klienta o peselu: " + pesel
+                ));
     }
 
     /**
@@ -65,16 +67,16 @@ public class ClientManager {
      * @param pesel Numer PESEL klienta do wypisania
      */
     public void unregisterClient(String pesel) {
-        List<Client> existingClients = findByPesel(pesel);
-        if (existingClients.isEmpty()) {
-            throw new RuntimeException("Nie znaleziono klienta w repozytorium.");
-        }
+        Client client = getExistingClient(pesel);
+        client.setArchive(true);
+        clientRepository.save(client);
+    }
 
-        if (existingClients.get(0) == null) {
-            throw new RuntimeException("Nieprawidłowy obiekt klienta.");
-        }
+    public void changeClientType(String pesel, ClientType type) {
+        Client client = getExistingClient(pesel);
 
-        existingClients.get(0).setArchive(true);
+        client.setClientType(type);
+        clientRepository.save(client);
     }
 
     /**
@@ -124,8 +126,8 @@ public class ClientManager {
      * @param pesel Numer PESEL, według którego wyszukiwani są klienci
      * @return Lista klientów o podanym numerze PESEL
      */
-    public List<Client> findByPesel(String pesel) {
-        return clientRepository.findByPesel(pesel);
+    public Optional<Client> findByPesel(String pesel) {
+        return clientRepository.findById(pesel);
     }
 
     /**
@@ -144,14 +146,5 @@ public class ClientManager {
      */
     public List<Client> findAll() {
         return clientRepository.findAll();
-    }
-
-    /**
-     * Generuje raport dotyczący klientów.
-     *
-     * @return Tekstowa reprezentacja danych raportu
-     */
-    public String report() {
-        return clientRepository.report();
     }
 }

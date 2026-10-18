@@ -1,58 +1,16 @@
 package repositories;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Optional;
 
+public interface MainRepository<T, ID> {
 
-public class MainRepository<T> {
+    T save(T entity);
 
-    private final List<T> elements = new ArrayList<>();
+    Optional<T> findById(ID id);
 
-    public void addElement(T element) {
-        if (element == null) {
-            throw new RuntimeException("element jest nullem");
-        }
-        elements.add(element);
-    }
+    List<T> findAll();
 
+    void deleteById(ID id);
 
-    public void removeElement(T element) {
-        if (element == null) {
-            throw new RuntimeException("element jest nullem");
-        }
-
-        boolean removed = elements.remove(element);
-        if (!removed) {
-            throw new RuntimeException("Nie znaleziono takiego elementu");
-        }
-    }
-
-
-    public int getSize() {
-        return elements.size();
-    }
-
-
-    public T getElement(int index) {
-        if (index < 0 || index >= elements.size()) {
-            throw new RuntimeException("Niewłaściwy indeks");
-        }
-        return elements.get(index);
-    }
-
-    public List<T> findBy(Predicate<T> predicate) {
-        List<T> found = new ArrayList<>();
-        for (T element : elements) {
-            if (predicate.test(element)) {
-                found.add(element);
-            }
-        }
-        return found;
-    }
-
-
-    public List<T> findAll() {
-        return elements;
-    }
 }

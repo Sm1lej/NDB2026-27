@@ -7,16 +7,12 @@ import java.time.Duration;
  */
 public abstract class Service {
 
-    private int id;
+    private Integer id;
     private String description;
     private double basePrice;
     private Duration estimatedDurationTime;
 
-    public Service(int id, String description, double basePrice, Duration estimatedDurationTime) {
-
-        if (id < 0) {
-            throw new RuntimeException("ID usługi nie może być ujemne.");
-        }
+    public Service(String description, double basePrice, Duration estimatedDurationTime) {
 
         if (description == null || description.isEmpty()) {
             throw new RuntimeException("Opis usługi nie może być pusty.");
@@ -30,17 +26,24 @@ public abstract class Service {
             throw new RuntimeException("Czas trwania usługi jest nieprawidłowy.");
         }
 
-        this.id = id;
         this.description = description;
         this.basePrice = basePrice;
         this.estimatedDurationTime = estimatedDurationTime;
     }
 
-    public int getId() {
+    public Service(Integer id, String description, double basePrice, Duration estimatedDurationTime) {
+        this(description, basePrice, estimatedDurationTime);
+        setId(id);
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
+        if (id == null || id <= 0) {
+            throw new RuntimeException("ID usługi nie może być ujemne.");
+        }
         this.id = id;
     }
 
