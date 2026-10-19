@@ -10,11 +10,8 @@ public class AddressEnt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false)
     private String city;
-    @Column(nullable = false)
     private String street;
-    @Column(nullable = false)
     private String number;
 
     public AddressEnt() {}

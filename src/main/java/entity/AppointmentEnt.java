@@ -12,7 +12,6 @@ public class AppointmentEnt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,7 +26,6 @@ public class AppointmentEnt {
     @JoinColumn(name = "service_id")
     private List<ServiceEnt> services = new ArrayList<>();
 
-    @Column(nullable = false)
     private boolean isArchive;
 
     public AppointmentEnt() {}

@@ -12,33 +12,18 @@ public abstract class VehicleEnt {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false)
+    @JoinColumn(name = "client_id")
     private ClientEnt owner;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String vinNumber;
-
     private String registrationNumber;
-
-    @Column(nullable = false)
     private int yearOfProduction;
-
-    @Column(nullable = false, length = 20)
     private String brand;
-
-    @Column(nullable = false, length = 20)
     private String model;
-
-    @Column(length = 20)
     private String color;
-
-    @Column(nullable = false)
     private double engineDisplacement;
-
-    @Column(nullable = false)
     private int enginePower;
-
-    @Column(nullable = false)
     private int weight;
 
     protected VehicleEnt() {}

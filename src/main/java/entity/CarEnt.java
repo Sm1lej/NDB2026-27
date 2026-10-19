@@ -6,13 +6,10 @@ import jakarta.persistence.*;
 @Table(name = "cars")
 public class CarEnt extends VehicleEnt {
 
-    @Column(nullable = false)
     private String bodyType;
 
-    @Column(nullable = false)
     private String fuelType;
 
-    @Column(nullable = false)
     private int doorsCount;
 
     public CarEnt() {

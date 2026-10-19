@@ -13,7 +13,6 @@ public class InvoiceEnt {
     @JoinColumn(name = "appointment_id", nullable = false)
     private AppointmentEnt appointment;
 
-    @Column(nullable = false)
     private boolean isPaid;
 
     public InvoiceEnt() {}

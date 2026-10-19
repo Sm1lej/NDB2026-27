@@ -12,7 +12,6 @@ public interface ClientRepository extends MainRepository<Client, String> {
 
      List<Client> findByPhoneNumber(String phoneNumber);
 
-
      List<Client> findByArchive();
 
 

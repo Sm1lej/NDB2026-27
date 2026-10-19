@@ -16,6 +16,12 @@
         <class>entity.InvoiceEnt</class>
         <class>entity.RepairServiceEnt</class>
         <class>entity.DiagnosticServiceEnt</class>
+        <class>entity.ClientTypeEnt</class>
+<!--        <class>entity.DiamondClientTypeEnt</class>-->
+<!--        <class>entity.GoldClientTypeEnt</class>-->
+<!--        <class>entity.DefaultClientTypeEnt</class>-->
+        <class>entity.AddressEnt</class>
+
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>NONE</shared-cache-mode>

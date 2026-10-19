@@ -8,7 +8,6 @@ import jakarta.persistence.Table;
 @Table(name = "motorbikes")
 public class MotorbikeEnt extends VehicleEnt {
 
-    @Column(nullable = false)
     private String brakeSystem;
 
     public MotorbikeEnt() {
