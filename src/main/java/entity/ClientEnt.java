@@ -26,12 +26,28 @@ public class ClientEnt {
 
     public ClientEnt() {}
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-    public String getPesel() { return pesel; }
-    public void setPesel(String pesel) { this.pesel = pesel; }
-    public List<VehicleEnt> getVehicles() { return vehicles; }
-    public void setVehicles(List<VehicleEnt> vehicles) { this.vehicles = vehicles; }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public String getPesel() {
+        return pesel;
+    }
+    public void setPesel(String pesel) {
+        this.pesel = pesel;
+    }
+    public List<VehicleEnt> getVehicles() {
+        return vehicles;
+    }
+    public void setVehicles(List<VehicleEnt> vehicles) {
+        this.vehicles = vehicles;
+    }
 }

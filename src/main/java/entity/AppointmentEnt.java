@@ -1,8 +1,6 @@
 package entity;
-import jakarta.persistence.*;
-import model.Client;
-import model.Invoice;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

@@ -46,6 +46,4 @@ public class InvoiceEnt {
     public void setPaid(boolean paid) {
         isPaid = paid;
     }
-
-
 }
