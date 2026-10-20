@@ -187,7 +187,7 @@ public class UserInterface {
     }
 
     public void addClient() {
-        String name = "", lastName = "", email = "", phoneNumber = "", pesel = "", city = "", street = "", number = "";
+        String name = "", lastName = "", email = "", phoneNumber = "", pesel = "", clientType = "";
         System.out.println("\n--- Dodawanie nowego klienta ---\n");
 
         // Walidacja w locie dla imienia
@@ -288,41 +288,16 @@ public class UserInterface {
             }
         } while (true);
 
-        // Walidacja w locie dla miasta
+        // Walidacja typu klienta
         do {
             try {
-                System.out.println("Podaj miasto: ");
-                city = scanner.nextLine();
-                if (city.isEmpty()) {
-                    throw new RuntimeException("Miasto nie może być puste");
+                System.out.println("Podaj typ klienta (Default | Gold | Diamond): ");
+                clientType = scanner.nextLine();
+                if (clientType.isEmpty()) {
+                    throw new RuntimeException("Pole nie może być puste");
                 }
-                break;
-            } catch (RuntimeException e) {
-                System.err.println("Błąd: " + e.getMessage() + "\nSpróbuj ponownie.\n");
-            }
-        } while (true);
-
-        // Walidacja w locie dla ulicy
-        do {
-            try {
-                System.out.println("Podaj ulicę: ");
-                street = scanner.nextLine();
-                if (street.isEmpty()) {
-                    throw new RuntimeException("Ulica nie może być pusta");
-                }
-                break;
-            } catch (RuntimeException e) {
-                System.err.println("Błąd: " + e.getMessage() + "\nSpróbuj ponownie.\n");
-            }
-        } while (true);
-
-        // Walidacja w locie dla numeru mieszkania/domu
-        do {
-            try {
-                System.out.println("Podaj numer mieszkania: ");
-                number = scanner.nextLine();
-                if (number.isEmpty()) {
-                    throw new RuntimeException("Numer nie może być pusty");
+                if (!clientType.equals("Default") && !clientType.equals("Gold") && !clientType.equals("Diamond")) {
+                    throw new RuntimeException("Nieprawidłowy typ klienta!");
                 }
                 break;
             } catch (RuntimeException e) {
@@ -332,7 +307,7 @@ public class UserInterface {
 
         // Końcowa rejestracja klienta po pomyślnym zweryfikowaniu wszystkich pól w locie
         try {
-            clientManager.registerClient(name, lastName, pesel, email, phoneNumber, city, street, number);
+            clientManager.registerClient(name, lastName, pesel, email, phoneNumber, clientType);
             System.out.println("Klient został dodany pomyślnie.\n");
         } catch (RuntimeException e) {
             System.err.println("Błąd: " + e.getMessage() + "\n");
@@ -341,7 +316,7 @@ public class UserInterface {
 
     public void findClient() {
         String input;
-        int choice = 8;
+        int choice = -1;
         do {
             displayClientFindMenu();
             input = scanner.nextLine();
@@ -353,29 +328,6 @@ public class UserInterface {
             }
             switch(choice) {
                 case 1: {
-                    String nazwisko;
-                    do {
-                        System.out.println("Podaj nazwisko klienta: ");
-                        nazwisko = scanner.nextLine();
-                        if(nazwisko.isEmpty()) System.out.println("Nazwisko nie może być puste.\n");
-                    } while (nazwisko.isEmpty());
-
-                    List<Client> found = clientManager.findByLastName(nazwisko);
-                    if (found.isEmpty()){
-                        System.out.println("Nieznaleziono klientów o podanym nazwisku\n");
-                        break;
-                    }
-                    System.out.println("Klienci o nazwisku: " + nazwisko + " :\n");
-                    int i = 1;
-                    for (Client client : found) {
-                        if (client != null) {
-                            System.out.println(i + ". " + client.getInfo() + '\n');
-                            i++;
-                        }
-                    }
-                    break;
-                }
-                case 2: {
                     String imie, nazwisko;
                     do {
                         System.out.println("Podaj imię klienta: ");
@@ -404,29 +356,7 @@ public class UserInterface {
                     }
                     break;
                 }
-                case 3: {
-                    String email;
-                    do {
-                        System.out.println("Podaj adres email klienta: ");
-                        email = scanner.nextLine();
-                    } while (!isValidEmail(email));
-
-                    List<Client> found = clientManager.findByEmailAddress(email);
-                    if (found.isEmpty()){
-                        System.out.println("Nieznaleziono klientów o podanym adresie email\n");
-                        break;
-                    }
-                    System.out.println("Klienci którzy mają adres email: " + email + " :\n");
-                    int i = 1;
-                    for (Client client : found) {
-                        if (client != null) {
-                            System.out.println(i + ". " + client.getInfo() + '\n');
-                            i++;
-                        }
-                    }
-                    break;
-                }
-                case 4: {
+                case 2: {
                     String phoneNumber;
                     do {
                         System.out.println("Podaj numer telefonu klienta: ");
@@ -448,7 +378,7 @@ public class UserInterface {
                     }
                     break;
                 }
-                case 5: {
+                case 3: {
                     String pesel;
                     do {
                         System.out.println("Podaj pesel klienta (11cyfr): ");
@@ -465,7 +395,7 @@ public class UserInterface {
                     System.out.println(client.getInfo() + '\n');
                     break;
                 }
-                case 6: {
+                case 4: {
                     List<Client> allClients = clientManager.findAll();
                     List<Client> archivedClients = new ArrayList<>();
                     for (Client client : allClients) {
@@ -487,13 +417,13 @@ public class UserInterface {
                     }
                     break;
                 }
-                case 7:
+                case 5:
                     break;
                 default:
                     System.out.println("Nieprawidłowy wybór!\n");
                     break;
             }
-        } while (choice != 7);
+        } while (choice != 5);
     }
 
     public void removeClient() {
@@ -559,7 +489,7 @@ public class UserInterface {
                         break;
                     }
 
-                    clientManager.changeClientType(pesel, new DefaultClientType());
+                    clientManager.changeClientType(pesel, "Default");
                     System.out.println("Domyślny typ klienta ustawiony pomyślnie\n");
                     break;
                 }
@@ -576,7 +506,7 @@ public class UserInterface {
                         break;
                     }
 
-                    clientManager.changeClientType(pesel, new GoldClientType());
+                    clientManager.changeClientType(pesel, "Gold");
                     System.out.println("Złoty typ klienta ustawiony pomyślnie\n");
                     break;
                 }
@@ -593,7 +523,7 @@ public class UserInterface {
                         break;
                     }
 
-                    clientManager.changeClientType(pesel, new DiamondClientType());
+                    clientManager.changeClientType(pesel, "Diamond");
                     System.out.println("Diamentowy typ klienta ustawiony pomyślnie\n");
                     break;
                 }
@@ -1363,13 +1293,11 @@ public class UserInterface {
 
     public void displayClientFindMenu() {
         System.out.println("Szukaj klienta po:");
-        System.out.println("1. Nazwisku");
-        System.out.println("2. Imieniu i Nazwisku");
-        System.out.println("3. Adresie email");
-        System.out.println("4. Numerze telefonu");
-        System.out.println("5. Numerze Pesel");
-        System.out.println("6. Pokaż archiwalnych klientów");
-        System.out.println("7. Powrót");
+        System.out.println("1. Imieniu i Nazwisku");
+        System.out.println("2. Adresie email");
+        System.out.println("3. Numerze telefonu");
+        System.out.println("4. Numerze Pesel");
+        System.out.println("5. Powrót");
         System.out.println("Wybierz opcję: ");
     }
 

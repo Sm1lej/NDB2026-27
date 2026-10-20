@@ -71,6 +71,10 @@ public abstract class Service {
         return estimatedDurationTime;
     }
 
+    public Duration getTotalEstimatedTime() {
+        return getEstimatedTime();
+    }
+
     public void setEstimatedDurationTime(Duration estimatedDurationTime) {
         this.estimatedDurationTime = estimatedDurationTime;
     }

@@ -1,4 +1,4 @@
-package entity;
+package Data.entity;
 
 import jakarta.persistence.*;
 
@@ -8,22 +8,35 @@ import jakarta.persistence.*;
 public abstract class VehicleEnt {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "vin_number", nullable = false, length = 17, updatable = false)
+    private String vinNumber;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_pesel", referencedColumnName = "pesel", nullable = false)
     private ClientEnt owner;
 
-    @Column(unique = true)
-    private String vinNumber;
+    @Column(name = "registration_number", nullable = false, unique = true)
     private String registrationNumber;
+
+    @Column(nullable = false)
     private int yearOfProduction;
+
+    @Column(nullable = false, length = 20)
     private String brand;
+
+    @Column(nullable = false, length = 20)
     private String model;
+
+    @Column(length = 20)
     private String color;
+
+    @Column(nullable = false)
     private double engineDisplacement;
+
+    @Column(nullable = false)
     private int enginePower;
+
+    @Column(nullable = false)
     private int weight;
 
     protected VehicleEnt() {}
@@ -42,9 +55,6 @@ public abstract class VehicleEnt {
         this.weight = weight;
     }
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public ClientEnt getOwner() { return owner; }
     public void setOwner(ClientEnt owner) { this.owner = owner; }

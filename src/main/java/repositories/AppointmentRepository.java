@@ -10,8 +10,8 @@ public interface AppointmentRepository extends MainRepository<Appointment, Integ
 
      List<Appointment> findByDate(LocalDateTime date);
 
-     List<Appointment> findByArchive();
-
-    List<Appointment> findByDateRange(LocalDateTime from, LocalDateTime to);
+//     List<Appointment> findByArchive();
+//
+//    List<Appointment> findByDateRange(LocalDateTime from, LocalDateTime to);
 
 }

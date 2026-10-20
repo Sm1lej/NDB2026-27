@@ -42,9 +42,6 @@ public class Appointment {
         if (date == null) {
             throw new RuntimeException("Data wizyty nie może być nullem");
         }
-        if (date.isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Data wizyty nie może być w przeszłości");
-        }
         this.date = date;
     }
 
@@ -106,14 +103,13 @@ public class Appointment {
     }
 
     public int getTotalDurationInMinutes() {
-        long totalSeconds = 0;
+        long totalMinutes = 0;
 
         for (Service service : services) {
-            // Przyjmujemy, że service.getEstimatedTime() zwraca java.time.Duration
-            totalSeconds += service.getEstimatedTime().getSeconds();
+            totalMinutes += service.getEstimatedTime().toMinutes();
         }
 
-        return (int) (totalSeconds / 60);
+        return (int) (totalMinutes);
     }
 
     public String getInfo() {

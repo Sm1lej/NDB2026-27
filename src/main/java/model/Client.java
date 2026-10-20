@@ -9,13 +9,12 @@ public class Client {
     private final String pesel;
     private String email;
     private String phoneNumber;
-    private Address address;
-    private ClientType clientType;
-    private ArrayList<Vehicle> vehicles = new ArrayList<>();
+    private String clientType;
+    private final ArrayList<Vehicle> vehicles = new ArrayList<>();
     private boolean isArchive = false;
 
     public Client(String name, String lastName, String pesel, String email,
-                  String phoneNumber, Address address) {
+                  String phoneNumber, String clientType) {
         if (name.isEmpty() || lastName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || pesel.isEmpty())
             throw new RuntimeException("Pole nie może być puste");
 
@@ -27,7 +26,6 @@ public class Client {
 
         if (email.length() > 255)
             throw new RuntimeException("Email przekracza maksymalną długość 255 znaków");
-
 
         for (int i = 0; i < pesel.length(); i++) {
             if (!Character.isDigit(pesel.charAt(i)))
@@ -52,11 +50,7 @@ public class Client {
         this.pesel = pesel;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.address = address;
-
-        if (this.address == null)
-            throw new RuntimeException("Adres nie może być nullem");
-        this.clientType = new DefaultClientType();
+        this.clientType = clientType;
     }
     public String getPesel() {
         return pesel;
@@ -82,20 +76,16 @@ public class Client {
         return isArchive;
     }
 
-    public ClientType getClientType() {
+    public String getClientType() {
         return clientType;
     }
 
-    public Address getAddress() {
-        return address;
-    }
 
     public String getInfo() {
         StringBuilder ss = new StringBuilder();
         ss.append("Imię: ").append(getName()).append(", nazwisko: ").append(getLastName()).append("\n")
                 .append("Pesel: ").append(getPesel()).append(", Adres email: ").append(getEmail()).append("\n")
-                .append("Numer telefonu: ").append(getPhoneNumber()).append(" i jest to ").append(clientType.getInfo()).append("\n")
-                .append("Adres zamieszkania: ").append(address.getInfo()).append("\n");
+                .append("Numer telefonu: ").append(getPhoneNumber()).append(" i jest to ").append(getClientType());
 
         return ss.toString();
     }
@@ -106,11 +96,10 @@ public class Client {
      }
 
 
-    public void setClientType(ClientType clientType) {
-        if (clientType == null)
+    public void setClientType(String clientType) {
+        if (!clientType.equals("Default") && !clientType.equals("Gold") && !clientType.equals("Diamond"))
             throw new RuntimeException("Typ klienta nie może być nullem");
-        if (clientType.equals(this.clientType))
-            throw new RuntimeException("Próba ustawienia tego samego typu klienta");
+
         this.clientType = clientType;
     }
 
@@ -149,15 +138,6 @@ public class Client {
         this.email = email;
     }
 
-    public void setAddress(Address address) {
-        if (address == null)
-            throw new RuntimeException("Adres nie może być nullem");
-        if (address.equals(this.address))
-            throw new RuntimeException("Próba nadpisania adresu tą samą wartością");
-
-        this.address = address;
-    }
-
     public void setName(String name) {
         if (name == null || name.isEmpty() || name.length() > 40)
             throw new RuntimeException("Niepoprawna długość imienia (max 40 znaków i nie może być puste)");
@@ -190,8 +170,6 @@ public class Client {
             throw new RuntimeException("Pojazd nie może być nullem");
         }
 
-        // Metoda List.remove(Object) zwraca 'true', jeśli obiekt był na liście i został usunięty.
-        // Jeśli go nie było, zwraca 'false', więc możemy od razu rzucić wyjątek.
         boolean removed = this.vehicles.remove(vehicle);
 
         if (!removed) {

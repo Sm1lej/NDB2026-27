@@ -56,7 +56,7 @@ public class DiagnosticService extends Service {
 
     @Override
     public double getPriceForClient() {
-        double price = super.getPriceForClient();
+        double price = super.getBasePrice();
         if (checkTires) {
             price += 25;
         }
@@ -70,7 +70,7 @@ public class DiagnosticService extends Service {
     }
 
     @Override
-    public Duration getEstimatedTime() {
+    public Duration getTotalEstimatedTime() {
         Duration duration = super.getEstimatedTime();
         if (duration == null) {
             duration = Duration.ZERO;

@@ -1,4 +1,4 @@
-package entity;
+package Data.entity;
 
 import jakarta.persistence.*;
 
@@ -9,22 +9,26 @@ public abstract class ServiceEnt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String description;
+
     private double basePrice;
+
+    private Long estimatedDurationMinutes;
 
     public ServiceEnt() {}
 
-    public ServiceEnt(String description, double basePrice) {
+    public ServiceEnt(String description, double basePrice, Long estimatedDurationMinutes) {
         this.description = description;
         this.basePrice = basePrice;
+        this.estimatedDurationMinutes = estimatedDurationMinutes;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
     public String getDescription() {
@@ -38,5 +42,13 @@ public abstract class ServiceEnt {
     }
     public void setBasePrice(double basePrice) {
         this.basePrice = basePrice;
+    }
+
+    public Long getEstimatedDurationMinutes() {
+        return estimatedDurationMinutes;
+    }
+
+    public void setEstimatedDurationMinutes(Long estimatedDurationMinutes) {
+        this.estimatedDurationMinutes = estimatedDurationMinutes;
     }
 }

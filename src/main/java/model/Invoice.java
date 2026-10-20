@@ -19,7 +19,7 @@ public class Invoice {
         setId(id);
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -46,7 +46,18 @@ public class Invoice {
         if (appointment != null && appointment.getServices() != null) {
             for (Service service : appointment.getServices()) {
                 double basePrice = service.getPriceForClient();
-                totalCost += appointment.getClient().getClientType().applyDiscount(basePrice);
+                Client client = appointment.getClient();
+
+                switch (client.getClientType()) {
+                    case "Default" :
+                        totalCost += basePrice;
+                        break;
+                    case "Gold":
+                        totalCost += basePrice * 0.9;
+                        break;
+                    case "Diamond":
+                        totalCost += basePrice * 0.75;
+                }
             }
         }
 

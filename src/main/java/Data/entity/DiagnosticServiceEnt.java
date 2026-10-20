@@ -1,9 +1,10 @@
-package entity;
+package Data.entity;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "diagnostic_services")
+@PrimaryKeyJoinColumn(name = "id")
 public class DiagnosticServiceEnt extends ServiceEnt {
 
     private boolean checkTires;
@@ -14,8 +15,8 @@ public class DiagnosticServiceEnt extends ServiceEnt {
         super();
     }
 
-    public DiagnosticServiceEnt(String description, double basePrice, boolean checkTires, boolean checkFluids, boolean checkBrake) {
-        super(description, basePrice);
+    public DiagnosticServiceEnt(String description, double basePrice, Long estimatedDurationMinutes, boolean checkTires, boolean checkFluids, boolean checkBrake) {
+        super(description, basePrice, estimatedDurationMinutes);
         this.checkTires = checkTires;
         this.checkFluids = checkFluids;
         this.checkBrake = checkBrake;

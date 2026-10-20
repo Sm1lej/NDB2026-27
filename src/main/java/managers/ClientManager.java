@@ -1,21 +1,13 @@
 package managers;
 
-import model.Appointment;
-import model.ClientType;
 import repositories.ClientRepository;
 import model.Client;
-import model.Address;
 import java.util.List;
 import java.util.Optional;
 
 public class ClientManager {
     private final ClientRepository clientRepository;
 
-    /**
-     * Konstruktor klasy ClientManager, tworzący obiekt menedżera z podanym repozytorium.
-     *
-     * @param clientRepository Repozytorium klientów
-     */
     public ClientManager(ClientRepository clientRepository) {
         if (clientRepository == null) {
             throw new RuntimeException("Nieprawidłowe repozytorium klientów.");
@@ -23,21 +15,9 @@ public class ClientManager {
         this.clientRepository = clientRepository;
     }
 
-    /**
-     * Rejestruje nowego klienta z podanymi danymi.
-     *
-     * @param name Imię klienta
-     * @param lastName Nazwisko klienta
-     * @param email Adres e-mail klienta
-     * @param phoneNumber Numer telefonu klienta
-     * @param pesel Numer PESEL klienta
-     * @param city Miasto zamieszkania klienta
-     * @param street Ulica zamieszkania klienta
-     * @param number Numer domu/mieszkania klienta
-     */
     public Client registerClient(String name, String lastName, String pesel,
                                  String email, String phoneNumber,
-                                 String city, String street, String number) {
+                                 String clientType) {
 
         if (clientRepository.findById(pesel).isPresent()) {
             throw new IllegalArgumentException(
@@ -45,9 +25,8 @@ public class ClientManager {
             );
         }
 
-        Address address = new Address(city, street, number);
         Client client = new Client(
-                name, lastName, pesel, email, phoneNumber, address
+                name, lastName, pesel, email, phoneNumber, clientType
         );
 
         return clientRepository.save(client);
@@ -72,22 +51,13 @@ public class ClientManager {
         clientRepository.save(client);
     }
 
-    public void changeClientType(String pesel, ClientType type) {
+    public void changeClientType(String pesel, String type) {
         Client client = getExistingClient(pesel);
 
         client.setClientType(type);
         clientRepository.save(client);
     }
 
-    /**
-     * Wyszukuje klientów na podstawie nazwiska.
-     *
-     * @param lastName Nazwisko, według którego wyszukiwani są klienci
-     * @return Lista klientów o podanym nazwisku
-     */
-    public List<Client> findByLastName(String lastName) {
-        return clientRepository.findByLastName(lastName);
-    }
 
     /**
      * Wyszukuje klientów na podstawie imienia i nazwiska.
@@ -100,15 +70,6 @@ public class ClientManager {
         return clientRepository.findByNameAndLastName(name, lastName);
     }
 
-    /**
-     * Wyszukuje klientów na podstawie adresu e-mail.
-     *
-     * @param email Adres e-mail, według którego wyszukiwani są klienci
-     * @return Lista klientów o podanym adresie e-mail
-     */
-    public List<Client> findByEmailAddress(String email) {
-        return clientRepository.findByEmailAddress(email);
-    }
 
     /**
      * Wyszukuje klientów na podstawie numeru telefonu.

@@ -1,4 +1,4 @@
-package entity;
+package Data.entity;
 
 import jakarta.persistence.*;
 
@@ -7,10 +7,10 @@ import jakarta.persistence.*;
 public class InvoiceEnt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "appointment_id", nullable = false)
+    @JoinColumn(name = "appointment_id", nullable = false, unique = true)
     private AppointmentEnt appointment;
 
     private boolean isPaid;
@@ -22,11 +22,11 @@ public class InvoiceEnt {
         this.isPaid = isPaid;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -7,20 +7,20 @@
     <persistence-unit name="WarsztatPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <class>entity.ClientEnt</class>
-        <class>entity.VehicleEnt</class>
-        <class>entity.CarEnt</class>
-        <class>entity.MotorbikeEnt</class>
-        <class>entity.ServiceEnt</class>
-        <class>entity.AppointmentEnt</class>
-        <class>entity.InvoiceEnt</class>
-        <class>entity.RepairServiceEnt</class>
-        <class>entity.DiagnosticServiceEnt</class>
-        <class>entity.ClientTypeEnt</class>
+        <class>Data.entity.ClientEnt</class>
+        <class>Data.entity.VehicleEnt</class>
+        <class>Data.entity.CarEnt</class>
+        <class>Data.entity.MotorbikeEnt</class>
+        <class>Data.entity.ServiceEnt</class>
+        <class>Data.entity.AppointmentEnt</class>
+        <class>Data.entity.InvoiceEnt</class>
+        <class>Data.entity.RepairServiceEnt</class>
+        <class>Data.entity.DiagnosticServiceEnt</class>
+        <class>Data.entity.ClientTypeEnt</class>
 <!--        <class>entity.DiamondClientTypeEnt</class>-->
 <!--        <class>entity.GoldClientTypeEnt</class>-->
 <!--        <class>entity.DefaultClientTypeEnt</class>-->
-        <class>entity.AddressEnt</class>
+        <class>Data.entity.AddressEnt</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
