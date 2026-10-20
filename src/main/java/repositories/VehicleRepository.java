@@ -12,7 +12,7 @@ public interface VehicleRepository extends MainRepository<Vehicle, String> {
 
      List<Vehicle> findByBrandAndModel(String brand, String model);
 
-     List<Vehicle> findByEngineDisplacement(int engineDisplacement);
+     List<Vehicle> findByEngineDisplacement(double engineDisplacement);
 
 
 }

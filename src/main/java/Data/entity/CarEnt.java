@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "cars")
-@PrimaryKeyJoinColumn(name = "vinNumber")
+@PrimaryKeyJoinColumn(name = "vin_number")
 public class CarEnt extends VehicleEnt {
     @Column(nullable = false)
     private String bodyType;
