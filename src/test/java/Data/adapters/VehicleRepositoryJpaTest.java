@@ -49,7 +49,7 @@ class VehicleRepositoryJpaTest {
 
     private Vehicle createTestVehicle(Client owner, String vinNumber) {
         // Tutaj utwórz Car zgodnie z konstruktorem Twojej klasy.
-        Car car = new Car(owner, vinNumber, "rejestracja", 2003,
+        Car car = new Car(owner, vinNumber, vinNumber, 2003,
                 "Audi", "A3", "szary", 1600, 105,
                 1300, "HatchBack", "benzyna", 3);
 

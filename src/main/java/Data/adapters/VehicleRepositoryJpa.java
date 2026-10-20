@@ -160,26 +160,45 @@ public class VehicleRepositoryJpa implements VehicleRepository {
 
     @Override
     public List<Vehicle> findByClientPesel(String clientPesel) {
-        return findByQuery(
-                "SELECT v FROM VehicleEnt v WHERE v.owner.pesel = :value",
-                clientPesel
-        );
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT v FROM VehicleEnt v WHERE v.owner.pesel = :pesel",
+                            VehicleEnt.class
+                    )
+                    .setParameter("pesel", clientPesel)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
     }
 
     @Override
     public List<Vehicle> findByVinNumber(String vinNumber) {
-        return findByQuery(
-                "SELECT v FROM VehicleEnt v WHERE v.vinNumber = :value",
-                vinNumber
-        );
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT v FROM VehicleEnt v WHERE v.vinNumber = :vinNumber",
+                            VehicleEnt.class
+                    )
+                    .setParameter("vinNumber", vinNumber)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
     }
 
     @Override
     public List<Vehicle> findByRegistrationNumber(String registrationNumber) {
-        return findByQuery(
-                "SELECT v FROM VehicleEnt v WHERE v.registrationNumber = :value",
-                registrationNumber
-        );
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT v FROM VehicleEnt v "
+                                    + "WHERE v.registrationNumber = :registrationNumber",
+                            VehicleEnt.class
+                    )
+                    .setParameter("registrationNumber", registrationNumber)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
     }
 
     @Override
@@ -210,16 +229,6 @@ public class VehicleRepositoryJpa implements VehicleRepository {
                     )
                     .setParameter("value", (double) engineDisplacement)
                     .getResultStream()
-                    .map(mapper::toDomain)
-                    .toList();
-        }
-    }
-
-    private List<Vehicle> findByQuery(String jpql, String value) {
-        try (EntityManager em = emf.createEntityManager()) {
-            List<VehicleEnt> vehicleEntities = em.createQuery(jpql, VehicleEnt.class).getResultList();
-
-            return vehicleEntities.stream()
                     .map(mapper::toDomain)
                     .toList();
         }
