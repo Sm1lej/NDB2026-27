@@ -19,9 +19,7 @@ public class AppointmentManager {
     private final AppointmentRepository appointmentRepository;
     private final ClientRepository clientRepository;
 
-    public AppointmentManager(
-            AppointmentRepository appointmentRepository,
-            AppointmentScheduler appointmentScheduler,
+    public AppointmentManager(AppointmentRepository appointmentRepository, AppointmentScheduler appointmentScheduler,
             ClientRepository clientRepository) {
 
         this.appointmentRepository = Objects.requireNonNull(
@@ -144,9 +142,6 @@ public class AppointmentManager {
         return appointmentRepository.findById(id);
     }
 
-    public List<Appointment> findByArchive() {
-        return appointmentRepository.findByArchive();
-    }
 
     public List<Appointment> findAll() {
         return appointmentRepository.findAll();

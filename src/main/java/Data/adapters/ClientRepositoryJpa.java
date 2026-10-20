@@ -5,6 +5,7 @@ import Data.mappers.ClientMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.LockModeType;
 import model.Client;
 import repositories.ClientRepository;
 
@@ -32,7 +33,8 @@ public class ClientRepositoryJpa implements ClientRepository {
             try {
                 transaction.begin();
 
-                ClientEnt clientEnt = em.find(ClientEnt.class, client.getPesel());
+                ClientEnt clientEnt = em.find(ClientEnt.class, client.getPesel(),
+                        LockModeType.PESSIMISTIC_WRITE);
 
                 if (clientEnt == null) {
 
@@ -74,7 +76,11 @@ public class ClientRepositoryJpa implements ClientRepository {
         try (EntityManager em = emf.createEntityManager()) {
             ClientEnt clientEnt = em.find(ClientEnt.class, pesel);
 
-            return Optional.ofNullable(clientEnt)
+            if (clientEnt == null || clientEnt.isArchive()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(clientEnt)
                     .map(mapper::toDomain);
         }
     }
@@ -82,10 +88,11 @@ public class ClientRepositoryJpa implements ClientRepository {
     @Override
     public List<Client> findAll() {
         try (EntityManager em = emf.createEntityManager()) {
-            List<ClientEnt> entities = em.createQuery("SELECT c FROM ClientEnt c",
-                    ClientEnt.class).getResultList();
-
-            return entities.stream()
+            return em.createQuery("""
+                        SELECT c FROM ClientEnt c
+                        WHERE c.isArchive = false
+                        """, ClientEnt.class)
+                    .getResultStream()
                     .map(mapper::toDomain)
                     .toList();
         }
@@ -93,25 +100,32 @@ public class ClientRepositoryJpa implements ClientRepository {
 
     @Override
     public void deleteById(String pesel) {
+        if (pesel == null || pesel.isBlank()) {
+            throw new IllegalArgumentException(
+                    "PESEL nie może być pusty");
+        }
 
-
-
-
-        try (EntityManager em = emf.createEntityManager();)
-        {
+        try (EntityManager em = emf.createEntityManager()) {
             EntityTransaction transaction = em.getTransaction();
-            try {
 
+            try {
                 transaction.begin();
 
-                ClientEnt clientEnt = em.find(ClientEnt.class, pesel);
+                ClientEnt clientEnt = em.find(ClientEnt.class, pesel,
+                        LockModeType.PESSIMISTIC_WRITE
+                );
 
                 if (clientEnt == null) {
                     throw new IllegalArgumentException(
                             "Nie znaleziono klienta o PESEL: " + pesel);
                 }
 
-                em.remove(clientEnt);
+                if (clientEnt.isArchive()) {
+                    throw new IllegalStateException(
+                            "Klient jest już zarchiwizowany");
+                }
+
+                clientEnt.setArchive(true);
 
                 transaction.commit();
 

@@ -16,16 +16,10 @@
         <class>Data.entity.InvoiceEnt</class>
         <class>Data.entity.RepairServiceEnt</class>
         <class>Data.entity.DiagnosticServiceEnt</class>
-        <class>Data.entity.ClientTypeEnt</class>
-<!--        <class>entity.DiamondClientTypeEnt</class>-->
-<!--        <class>entity.GoldClientTypeEnt</class>-->
-<!--        <class>entity.DefaultClientTypeEnt</class>-->
-        <class>Data.entity.AddressEnt</class>
-
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>NONE</shared-cache-mode>
-        <validation-mode>CALLBACK</validation-mode>
+
 
         <properties>
 
@@ -38,7 +32,8 @@
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.highlight_sql" value="true"/>
-
+            <property name="jakarta.persistence.validation.mode" value="none"/>
         </properties>
+
     </persistence-unit>
 </persistence>

@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 
+import jakarta.persistence.LockModeType;
 import model.Appointment;
 import model.Service;
 
@@ -68,11 +69,15 @@ public class AppointmentRepositoryJpa implements AppointmentRepository {
                     // ISTNIEJĄCA WIZYTA
 
                     appointmentEnt = em.find(AppointmentEnt.class,
-                            appointment.getId());
+                            appointment.getId(), LockModeType.PESSIMISTIC_WRITE);
 
                     if (appointmentEnt == null) {
                         throw new IllegalArgumentException("Nie znaleziono wizyty o ID: "
                                         + appointment.getId());
+                    }
+
+                    if (appointmentEnt.isArchive() && appointment.isArchive()) {
+                        throw new IllegalStateException("Wizyta jest już zarchiwizowana");
                     }
 
                     updateAppointmentEnt(appointmentEnt, appointment, clientEnt,
@@ -240,6 +245,32 @@ public class AppointmentRepositoryJpa implements AppointmentRepository {
                             """,
                             AppointmentEnt.class)
                     .setParameter("date", date)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
+    }
+
+    @Override
+    public List<Appointment> findByDateRange(LocalDateTime from, LocalDateTime to) {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException(
+                    "Daty nie mogą być nullem");
+        }
+
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException(
+                    "Data początkowa nie może być późniejsza od końcowej");
+        }
+
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery("""
+                        SELECT a FROM AppointmentEnt a
+                        WHERE a.date BETWEEN :from AND :to
+                        ORDER BY a.date ASC
+                        """, AppointmentEnt.class)
+                    .setParameter("from", from)
+                    .setParameter("to", to)
                     .getResultStream()
                     .map(mapper::toDomain)
                     .toList();

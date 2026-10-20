@@ -46,9 +46,7 @@ public class ClientManager {
      * @param pesel Numer PESEL klienta do wypisania
      */
     public void unregisterClient(String pesel) {
-        Client client = getExistingClient(pesel);
-        client.setArchive(true);
-        clientRepository.save(client);
+        clientRepository.deleteById(pesel);
     }
 
     public void changeClientType(String pesel, String type) {

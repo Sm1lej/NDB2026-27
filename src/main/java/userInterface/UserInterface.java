@@ -396,27 +396,23 @@ public class UserInterface {
                     break;
                 }
                 case 4: {
-                    List<Client> allClients = clientManager.findAll();
-                    List<Client> archivedClients = new ArrayList<>();
-                    for (Client client : allClients) {
-                        if (client != null && client.isArchive()) {
-                            archivedClients.add(client);
-                        }
-                    }
 
-                    if (archivedClients.isEmpty()) {
-                        System.out.println("Brak archiwalnych klientów.\n");
+                    List<Client> found = clientManager.findByArchive();
+                    if (found.isEmpty()){
+                        System.out.println("Nieznaleziono archiwalnych klientów\n");
                         break;
                     }
-
-                    System.out.println("Archiwalni klienci:\n");
+                    System.out.println("Archiwalni klienci :\n");
                     int i = 1;
-                    for (Client client : archivedClients) {
-                        System.out.println(i + ". " + client.getInfo() + "\n");
-                        i++;
+                    for (Client client : found) {
+                        if (client != null) {
+                            System.out.println(i + ". " + client.getInfo() + '\n');
+                            i++;
+                        }
                     }
                     break;
                 }
+
                 case 5:
                     break;
                 default:
@@ -1294,9 +1290,9 @@ public class UserInterface {
     public void displayClientFindMenu() {
         System.out.println("Szukaj klienta po:");
         System.out.println("1. Imieniu i Nazwisku");
-        System.out.println("2. Adresie email");
-        System.out.println("3. Numerze telefonu");
-        System.out.println("4. Numerze Pesel");
+        System.out.println("2. Numerze telefonu");
+        System.out.println("3. Numerze Pesel");
+        System.out.println("4. Archiwalni klienci");
         System.out.println("5. Powrót");
         System.out.println("Wybierz opcję: ");
     }

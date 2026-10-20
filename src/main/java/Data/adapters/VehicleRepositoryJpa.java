@@ -8,6 +8,7 @@ import Data.mappers.VehicleMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.LockModeType;
 import model.Car;
 import model.Motorbike;
 import model.Vehicle;
@@ -136,7 +137,8 @@ public class VehicleRepositoryJpa implements VehicleRepository {
             try {
                 transaction.begin();
 
-                VehicleEnt vehicleEnt = em.find(VehicleEnt.class, vinNumber);
+                VehicleEnt vehicleEnt = em.find(VehicleEnt.class, vinNumber,
+                        LockModeType.PESSIMISTIC_WRITE);
                 if (vehicleEnt == null) {
                     throw new IllegalArgumentException(
                             "Nie znaleziono pojazdu o VIN: " + vinNumber
