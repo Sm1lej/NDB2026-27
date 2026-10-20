@@ -21,11 +21,11 @@ import model.*;
  * Klasa interfejsu użytkownika obsługująca interakcję z konsolą.
  */
 public class UserInterface {
-    private ClientManager clientManager;
-    private VehicleManager vehicleManager;
-    private ServiceManager serviceManager;
-    private AppointmentManager appointmentManager;
-    private Scanner scanner;
+    private final ClientManager clientManager;
+    private final VehicleManager vehicleManager;
+    private final ServiceManager serviceManager;
+    private final AppointmentManager appointmentManager;
+    private final Scanner scanner;
 
     public UserInterface(ClientManager clientManager,
                          VehicleManager vehicleManager,
@@ -860,12 +860,26 @@ public class UserInterface {
                     }
                     break;
                 }
-                case 6: break;
+                case 6:
+                    List<Vehicle> found = vehicleManager.findAll();
+                    if (found.isEmpty()){
+                        System.out.println("Nieznaleziono żadnych pojazdów\n");
+                        break;
+                    }
+                    System.out.println("Znalezione pojazdy:\n");
+                    int i = 1;
+                    for (Vehicle vehicle : found) {
+                        if (vehicle != null) {
+                            System.out.println(i + ". " + vehicle.getInfo() + '\n');
+                            i++;
+                        }
+                    }
+                case 7: break;
                 default:
                     System.out.println("Wybierz poprawną opcję\n");
                     break;
             }
-        } while (choice != 6);
+        } while (choice != 7);
     }
 
     public void removeVehicle() {
@@ -1045,22 +1059,20 @@ public class UserInterface {
     }
 
     public void findService() {
-        String idStr;
-        int id;
-
-        do {
-            System.out.println("Podaj ID usługi: ");
-            idStr = scanner.nextLine();
-        } while(!isPositiveNumber(idStr));
-        id = Integer.parseInt(idStr);
-
-        Optional<Service> service = serviceManager.findById(id);
-        if(service.isEmpty()) {
-            System.out.println("Nie znaleziono usługi.\n");
+        List<Service> found = serviceManager.findAll();
+        if (found.isEmpty()){
+            System.out.println("Nieznaleziono żadnych usług\n");
             return;
         }
 
-        System.out.println("Usługa:\n" + service.get().getInfo() + "\n");
+        System.out.println("Znalezione usługi:\n");
+        int i = 1;
+        for (Service service : found) {
+            if (service != null) {
+                System.out.println(i + ". " + service.getInfo() + '\n');
+                i++;
+            }
+        }
     }
 
     public void removeService() {
@@ -1105,7 +1117,20 @@ public class UserInterface {
                 case 2: findAppointment(); break;
                 case 3: cancelAppointment(); break;
                 case 4: archiveAppointment(); break;
-                case 0: break;
+                case 5:
+                    List<Appointment> found = appointmentManager.findAll();
+                    if (found.isEmpty()){
+                        System.out.println("Nieznaleziono wizyt\n");
+                        break;
+                    }
+                    System.out.println("Znalezione wizyty:\n");
+                    int i = 1;
+                    for (Appointment appointment : found) {
+                        if (appointment != null) {
+                            System.out.println(i + ". " + appointment.getInfo() + '\n');
+                            i++;
+                        }
+                    }
                 default: System.out.println("Nieprawidłowy wybór!\n");
             }
         } while(choice != 0);
@@ -1271,7 +1296,7 @@ public class UserInterface {
         System.out.println("===== ZARZADZANIE USLUGAMI =====");
         System.out.println("1. Dodaj usługę naprawcza");
         System.out.println("2. Dodaj usługę diagnostyczna");
-        System.out.println("3. Wyszukaj usługę");
+        System.out.println("3. Pokaż wszystkie usługi");
         System.out.println("4. Usuń usługę");
         System.out.println("0. Powrót");
         System.out.println("Wybierz opcję: ");
@@ -1283,6 +1308,7 @@ public class UserInterface {
         System.out.println("2. Wyszukaj wizytę");
         System.out.println("3. Anuluj wizytę");
         System.out.println("4. Archiwizuj wizytę");
+        System.out.println("5. Pokaż wszystkie wizyty");
         System.out.println("0. Powrót");
         System.out.println("Wybierz opcję: ");
     }
@@ -1304,7 +1330,8 @@ public class UserInterface {
         System.out.println("3. Tablicy rejestracyjnej");
         System.out.println("4. Marce i modelu pojazdu");
         System.out.println("5. Po pojemności silnika");
-        System.out.println("6. Powrót");
+        System.out.println("6. Pokaż wszystkie samochody");
+        System.out.println("7. Powrót");
         System.out.println("Wybierz opcję: ");
     }
 

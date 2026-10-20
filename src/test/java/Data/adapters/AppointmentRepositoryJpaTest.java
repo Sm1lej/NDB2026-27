@@ -83,7 +83,7 @@ class AppointmentRepositoryJpaTest {
                 new Appointment(LocalDateTime.now().plusDays(5), client)
         );
 
-        LocalDateTime newDate = LocalDateTime.now().plusDays(10);
+        LocalDateTime newDate = LocalDateTime.now().plusDays(10).withNano(0);
 
         appointment.setDate(newDate);
         appointmentRepo.save(appointment);

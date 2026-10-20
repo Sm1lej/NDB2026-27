@@ -47,12 +47,12 @@ public class Main {
               AppointmentManager appointmentManager = new AppointmentManager(appointmentRepo, scheduler, clientRepo);
 
 
+              DataInitializer dataInitializer = new DataInitializer(clientRepo, vehicleRepo,
+                      serviceRepo, appointmentRepo);
+              dataInitializer.initialize();
+
               UserInterface menu = new UserInterface(clientManager, vehicleManager, serviceManager, appointmentManager);
               menu.run();
-
           }
-
-
-
     }
 }

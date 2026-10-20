@@ -33,8 +33,7 @@ public class ClientRepositoryJpa implements ClientRepository {
             try {
                 transaction.begin();
 
-                ClientEnt clientEnt = em.find(ClientEnt.class, client.getPesel(),
-                        LockModeType.PESSIMISTIC_WRITE);
+                ClientEnt clientEnt = em.find(ClientEnt.class, client.getPesel());
 
                 if (clientEnt == null) {
 
