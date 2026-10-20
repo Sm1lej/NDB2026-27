@@ -216,15 +216,16 @@ public class AppointmentRepositoryJpa implements AppointmentRepository {
         }
 
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(
+            List<AppointmentEnt> appointmentEntities = em.createQuery(
                             """
                             SELECT a FROM AppointmentEnt a
                             WHERE a.client.pesel = :clientPesel
                             """,
-                            AppointmentEnt.class
-                    )
+                            AppointmentEnt.class)
                     .setParameter("clientPesel", clientPesel)
-                    .getResultStream()
+                    .getResultList();
+
+            return appointmentEntities.stream()
                     .map(mapper::toDomain)
                     .toList();
         }
@@ -238,14 +239,16 @@ public class AppointmentRepositoryJpa implements AppointmentRepository {
         }
 
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(
+            List<AppointmentEnt> appointmentEntities = em.createQuery(
                             """
                             SELECT a FROM AppointmentEnt a
                             WHERE a.date = :date
                             """,
                             AppointmentEnt.class)
                     .setParameter("date", date)
-                    .getResultStream()
+                    .getResultList();
+
+            return appointmentEntities.stream()
                     .map(mapper::toDomain)
                     .toList();
         }
@@ -264,14 +267,16 @@ public class AppointmentRepositoryJpa implements AppointmentRepository {
         }
 
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery("""
+            List<AppointmentEnt> appointmentEntities = em.createQuery("""
                         SELECT a FROM AppointmentEnt a
                         WHERE a.date BETWEEN :from AND :to
                         ORDER BY a.date ASC
                         """, AppointmentEnt.class)
                     .setParameter("from", from)
                     .setParameter("to", to)
-                    .getResultStream()
+                    .getResultList();
+
+            return appointmentEntities.stream()
                     .map(mapper::toDomain)
                     .toList();
         }

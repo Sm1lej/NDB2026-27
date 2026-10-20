@@ -119,11 +119,12 @@ public class VehicleRepositoryJpa implements VehicleRepository {
     @Override
     public List<Vehicle> findAll() {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(
+            List<VehicleEnt> vehicleEntities = em.createQuery(
                             "SELECT v FROM VehicleEnt v",
                             VehicleEnt.class
                     )
-                    .getResultStream()
+                    .getResultList();
+            return vehicleEntities.stream()
                     .map(mapper::toDomain)
                     .toList();
         }
@@ -216,9 +217,9 @@ public class VehicleRepositoryJpa implements VehicleRepository {
 
     private List<Vehicle> findByQuery(String jpql, String value) {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(jpql, VehicleEnt.class)
-                    .setParameter("value", value)
-                    .getResultStream()
+            List<VehicleEnt> vehicleEntities = em.createQuery(jpql, VehicleEnt.class).getResultList();
+
+            return vehicleEntities.stream()
                     .map(mapper::toDomain)
                     .toList();
         }
