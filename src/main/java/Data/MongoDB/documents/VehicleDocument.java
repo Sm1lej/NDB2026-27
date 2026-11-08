@@ -30,11 +30,11 @@ public abstract class VehicleDocument {
         this.vinNumber = vinNumber;
     }
 
-    public String getOwner() {
+    public String getOwnerPesel() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwnerPesel(String owner) {
         this.owner = owner;
     }
 
