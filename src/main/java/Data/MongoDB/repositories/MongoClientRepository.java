@@ -73,7 +73,7 @@ public class MongoClientRepository implements ClientRepository {
     public List<Client> findByNameAndLastName(String name, String lastName) {
         List<ClientDocument> clientDoc =
                 collection.find(Filters.and(Filters.eq("name", name),
-                        Filters.eq("lastName", lastName)))
+                                Filters.eq("lastName", lastName)))
                         .into(new ArrayList<>());
 
         return clientDoc.stream()
