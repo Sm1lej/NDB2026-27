@@ -1,9 +1,9 @@
 package pl.lodz.p;
 
-import Data.PostgreSQL.adapters.AppointmentRepositoryJpa;
-import Data.PostgreSQL.adapters.ClientRepositoryJpa;
-import Data.PostgreSQL.adapters.ServiceRepositoryJpa;
-import Data.PostgreSQL.adapters.VehicleRepositoryJpa;
+import Data.PostgreSQL.repositories.AppointmentRepositoryJpa;
+import Data.PostgreSQL.repositories.ClientRepositoryJpa;
+import Data.PostgreSQL.repositories.ServiceRepositoryJpa;
+import Data.PostgreSQL.repositories.VehicleRepositoryJpa;
 import Data.PostgreSQL.mappers.*;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;

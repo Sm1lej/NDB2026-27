@@ -1,4 +1,4 @@
-package Data.PostgreSQL.adapters;
+package Data.PostgreSQL.repositories;
 
 import Data.PostgreSQL.entity.ServiceEnt;
 import Data.PostgreSQL.entity.RepairServiceEnt;

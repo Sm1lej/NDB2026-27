@@ -1,6 +1,6 @@
 package Data.adapters;
 
-import Data.PostgreSQL.adapters.ServiceRepositoryJpa;
+import Data.PostgreSQL.repositories.ServiceRepositoryJpa;
 import Data.PostgreSQL.mappers.ServiceMapper;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;

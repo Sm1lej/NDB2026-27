@@ -1,7 +1,7 @@
 package Data.adapters;
 
-import Data.PostgreSQL.adapters.AppointmentRepositoryJpa;
-import Data.PostgreSQL.adapters.ClientRepositoryJpa;
+import Data.PostgreSQL.repositories.AppointmentRepositoryJpa;
+import Data.PostgreSQL.repositories.ClientRepositoryJpa;
 import Data.PostgreSQL.mappers.AppointmentMapper;
 import Data.PostgreSQL.mappers.ClientMapper;
 import Data.PostgreSQL.mappers.InvoiceMapper;

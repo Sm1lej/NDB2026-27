@@ -8,7 +8,7 @@ public class ClientDocument {
     private String pesel;
 
     private String name;
-    private String lastname;
+    private String lastName;
     private String email;
     private String phoneNumber;
     private String clientType;
@@ -49,11 +49,11 @@ public class ClientDocument {
     }
 
     public String getLastname() {
-        return lastname;
+        return lastName;
     }
 
     public void setLastname(String lastname) {
-        this.lastname = lastname;
+        this.lastName = lastname;
     }
 
     public String getName() {
