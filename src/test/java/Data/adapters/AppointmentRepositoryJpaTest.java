@@ -1,9 +1,11 @@
 package Data.adapters;
 
-import Data.mappers.AppointmentMapper;
-import Data.mappers.ClientMapper;
-import Data.mappers.InvoiceMapper;
-import Data.mappers.ServiceMapper;
+import Data.PostgreSQL.adapters.AppointmentRepositoryJpa;
+import Data.PostgreSQL.adapters.ClientRepositoryJpa;
+import Data.PostgreSQL.mappers.AppointmentMapper;
+import Data.PostgreSQL.mappers.ClientMapper;
+import Data.PostgreSQL.mappers.InvoiceMapper;
+import Data.PostgreSQL.mappers.ServiceMapper;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import model.Appointment;

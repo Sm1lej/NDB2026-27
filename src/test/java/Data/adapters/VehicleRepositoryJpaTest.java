@@ -1,7 +1,9 @@
 package Data.adapters;
 
-import Data.mappers.ClientMapper;
-import Data.mappers.VehicleMapper;
+import Data.PostgreSQL.adapters.ClientRepositoryJpa;
+import Data.PostgreSQL.adapters.VehicleRepositoryJpa;
+import Data.PostgreSQL.mappers.ClientMapper;
+import Data.PostgreSQL.mappers.VehicleMapper;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import model.Car;

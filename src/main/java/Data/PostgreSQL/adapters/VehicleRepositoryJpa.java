@@ -1,0 +1,236 @@
+package Data.PostgreSQL.adapters;
+
+import Data.PostgreSQL.entity.ClientEnt;
+import Data.PostgreSQL.entity.CarEnt;
+import Data.PostgreSQL.entity.MotorbikeEnt;
+import Data.PostgreSQL.entity.VehicleEnt;
+import Data.PostgreSQL.mappers.VehicleMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.LockModeType;
+import model.Car;
+import model.Motorbike;
+import model.Vehicle;
+import repositories.VehicleRepository;
+
+
+import java.util.List;
+import java.util.Optional;
+
+public class VehicleRepositoryJpa implements VehicleRepository {
+
+    private final EntityManagerFactory emf;
+    private final VehicleMapper mapper;
+
+    public VehicleRepositoryJpa(EntityManagerFactory emf, VehicleMapper mapper) {
+        this.emf = emf;
+        this.mapper = mapper;
+    }
+
+    @Override
+    public Vehicle save(Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Pojazd nie może być nullem");
+        }
+
+        try (EntityManager em = emf.createEntityManager()) {
+            EntityTransaction transaction = em.getTransaction();
+
+            try {
+                transaction.begin();
+
+                VehicleEnt vehicleEnt = em.find(
+                        VehicleEnt.class,
+                        vehicle.getVinNumber()
+                );
+
+                ClientEnt owner = em.find(
+                        ClientEnt.class,
+                        vehicle.getOwner().getPesel()
+                );
+
+                if (owner == null) {
+                    throw new IllegalArgumentException(
+                            "Nie znaleziono klienta o PESELu: "
+                                    + vehicle.getOwner().getPesel()
+                    );
+                }
+
+                if (vehicleEnt == null) {
+                    vehicleEnt = mapper.toEntity(vehicle, owner);
+                    em.persist(vehicleEnt);
+                } else {
+                    updateVehicleEnt(vehicleEnt, vehicle, owner);
+                }
+
+                em.flush();
+                Vehicle result = mapper.toDomain(vehicleEnt);
+
+                transaction.commit();
+                return result;
+
+            } catch (RuntimeException e) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+                throw e;
+            }
+        }
+    }
+
+    private void updateVehicleEnt(
+            VehicleEnt vehicleEnt,
+            Vehicle vehicle,
+            ClientEnt owner
+    ) {
+        if (vehicleEnt instanceof CarEnt carEnt && vehicle instanceof Car car) {
+            carEnt.setBodyType(car.getBodyType());
+            carEnt.setFuelType(car.getFuelType());
+            carEnt.setDoorsCount(car.getDoorsCount());
+        } else if (vehicleEnt instanceof MotorbikeEnt motorbikeEnt
+                && vehicle instanceof Motorbike motorbike) {
+            motorbikeEnt.setBrakeSystem(motorbike.getBrakeSystem());
+        } else {
+            throw new IllegalArgumentException(
+                    "Nie można zmienić typu istniejącego pojazdu"
+            );
+        }
+
+        vehicleEnt.setOwner(owner);
+        vehicleEnt.setRegistrationNumber(vehicle.getRegistrationNumber());
+        vehicleEnt.setYearOfProduction(vehicle.getYearOfProduction());
+        vehicleEnt.setBrand(vehicle.getBrand());
+        vehicleEnt.setModel(vehicle.getModel());
+        vehicleEnt.setColor(vehicle.getColor());
+        vehicleEnt.setEngineDisplacement(vehicle.getEngineDisplacement());
+        vehicleEnt.setEnginePower(vehicle.getEnginePower());
+        vehicleEnt.setWeight(vehicle.getWeight());
+    }
+
+    @Override
+    public Optional<Vehicle> findById(String vinNumber) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return Optional.ofNullable(em.find(VehicleEnt.class, vinNumber))
+                    .map(mapper::toDomain);
+        }
+    }
+
+    @Override
+    public List<Vehicle> findAll() {
+        try (EntityManager em = emf.createEntityManager()) {
+            List<VehicleEnt> vehicleEntities = em.createQuery(
+                            "SELECT v FROM VehicleEnt v",
+                            VehicleEnt.class
+                    )
+                    .getResultList();
+            return vehicleEntities.stream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
+    }
+
+    @Override
+    public void deleteById(String vinNumber) {
+        try (EntityManager em = emf.createEntityManager()) {
+            EntityTransaction transaction = em.getTransaction();
+
+            try {
+                transaction.begin();
+
+                VehicleEnt vehicleEnt = em.find(VehicleEnt.class, vinNumber,
+                        LockModeType.PESSIMISTIC_WRITE);
+                if (vehicleEnt == null) {
+                    throw new IllegalArgumentException(
+                            "Nie znaleziono pojazdu o VIN: " + vinNumber
+                    );
+                }
+
+                em.remove(vehicleEnt);
+                transaction.commit();
+
+            } catch (RuntimeException e) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    public List<Vehicle> findByClientPesel(String clientPesel) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT v FROM VehicleEnt v WHERE v.owner.pesel = :pesel",
+                            VehicleEnt.class
+                    )
+                    .setParameter("pesel", clientPesel)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
+    }
+
+    @Override
+    public List<Vehicle> findByVinNumber(String vinNumber) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT v FROM VehicleEnt v WHERE v.vinNumber = :vinNumber",
+                            VehicleEnt.class
+                    )
+                    .setParameter("vinNumber", vinNumber)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
+    }
+
+    @Override
+    public List<Vehicle> findByRegistrationNumber(String registrationNumber) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT v FROM VehicleEnt v "
+                                    + "WHERE v.registrationNumber = :registrationNumber",
+                            VehicleEnt.class
+                    )
+                    .setParameter("registrationNumber", registrationNumber)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
+    }
+
+    @Override
+    public List<Vehicle> findByBrandAndModel(String brand, String model) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            """
+                            SELECT v FROM VehicleEnt v
+                            WHERE v.brand = :brand AND v.model = :model
+                            """,
+                            VehicleEnt.class
+                    )
+                    .setParameter("brand", brand)
+                    .setParameter("model", model)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
+    }
+
+    @Override
+    public List<Vehicle> findByEngineDisplacement(double engineDisplacement) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT v FROM VehicleEnt v "
+                                    + "WHERE v.engineDisplacement = :value",
+                            VehicleEnt.class
+                    )
+                    .setParameter("value", (double) engineDisplacement)
+                    .getResultStream()
+                    .map(mapper::toDomain)
+                    .toList();
+        }
+    }
+}

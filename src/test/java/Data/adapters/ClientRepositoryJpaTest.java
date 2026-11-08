@@ -1,6 +1,7 @@
 package Data.adapters;
 
-import Data.mappers.ClientMapper;
+import Data.PostgreSQL.adapters.ClientRepositoryJpa;
+import Data.PostgreSQL.mappers.ClientMapper;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import model.Client;

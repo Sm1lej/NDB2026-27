@@ -1,6 +1,7 @@
 package Data.adapters;
 
-import Data.mappers.ServiceMapper;
+import Data.PostgreSQL.adapters.ServiceRepositoryJpa;
+import Data.PostgreSQL.mappers.ServiceMapper;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.*;

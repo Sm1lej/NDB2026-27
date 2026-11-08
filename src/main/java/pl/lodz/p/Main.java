@@ -1,10 +1,10 @@
 package pl.lodz.p;
 
-import Data.adapters.AppointmentRepositoryJpa;
-import Data.adapters.ClientRepositoryJpa;
-import Data.adapters.ServiceRepositoryJpa;
-import Data.adapters.VehicleRepositoryJpa;
-import Data.mappers.*;
+import Data.PostgreSQL.adapters.AppointmentRepositoryJpa;
+import Data.PostgreSQL.adapters.ClientRepositoryJpa;
+import Data.PostgreSQL.adapters.ServiceRepositoryJpa;
+import Data.PostgreSQL.adapters.VehicleRepositoryJpa;
+import Data.PostgreSQL.mappers.*;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import managers.*;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
+    static void main() {
 //        // Inicjalizacja repozytoriów
 
           try (EntityManagerFactory emf = Persistence.createEntityManagerFactory("WarsztatPU")) {
