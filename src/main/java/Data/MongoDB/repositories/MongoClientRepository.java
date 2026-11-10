@@ -68,7 +68,6 @@ public class MongoClientRepository implements ClientRepository {
         }
     }
 
-
     @Override
     public List<Client> findByNameAndLastName(String name, String lastName) {
         List<ClientDocument> clientDoc =
