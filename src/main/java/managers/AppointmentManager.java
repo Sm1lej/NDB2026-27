@@ -93,7 +93,7 @@ public class AppointmentManager {
         }
 
         Invoice invoice = new Invoice(appointment);
-        appointment.addInvoice(invoice);
+        appointment.setInvoice(invoice);
 
         return appointmentRepository.save(appointment);
     }

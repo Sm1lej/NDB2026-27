@@ -63,7 +63,7 @@ public class AppointmentMapper {
         }
 
         if (appointmentEnt.getInvoice() != null) {
-            appointment.addInvoice(invoiceMapper.toDomain(appointmentEnt.getInvoice(), appointment));
+            appointment.setInvoice(invoiceMapper.toDomain(appointmentEnt.getInvoice(), appointment));
         }
 
         return appointment;

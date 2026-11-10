@@ -60,7 +60,7 @@ public class Appointment {
         return invoice;
     }
 
-    public void addInvoice(Invoice invoice) {
+    public void setInvoice(Invoice invoice) {
         if (this.invoice != null) {
             throw new RuntimeException("Wizyta posiada już przypisaną fakturę");
         }
