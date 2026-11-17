@@ -41,7 +41,13 @@ public class MongoVehicleRepository implements VehicleRepository {
         if (vehicle == null) {
             throw new IllegalArgumentException("Pojazd nie może być nullem");
         }
-        // brakuje sprawdzania właściciela
+        if (vehicle.getOwner() != null) {
+            clientRepository.findById(vehicle.getOwner().getPesel())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Nie można zapisać pojazdu. Właściciel o numerze PESEL "
+                                    + vehicle.getOwner().getPesel() + " nie istnieje."
+                    ));
+        }
         VehicleDocument document = vehicleMapper.toDocument(vehicle);
 
         collection.replaceOne(
