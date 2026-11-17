@@ -1,10 +1,12 @@
 package Data.MongoDB;
 
+import Data.MongoDB.documents.*;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 
+import model.Motorbike;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -22,6 +24,14 @@ public class MongoConfig implements AutoCloseable {
         PojoCodecProvider pojoCodecProvider =
                 PojoCodecProvider.builder()
                         .register("Data.MongoDB.documents")
+                        .register(
+                                ServiceDocument.class,
+                                RepairServiceDocument.class,
+                                DiagnosticServiceDocument.class,
+                                VehicleDocument.class,
+                                MotorbikeDocument.class,
+                                CarDocument.class
+                        )
                         .conventions(Conventions.DEFAULT_CONVENTIONS)
                         .build();
 
