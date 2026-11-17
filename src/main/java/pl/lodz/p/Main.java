@@ -1,10 +1,16 @@
 package pl.lodz.p;
 
-import Data.PostgreSQL.repositories.mappers.*;
+import Data.MongoDB.MongoConfig;
+import Data.MongoDB.repositories.MongoAppointmentRepository;
+import Data.MongoDB.repositories.MongoClientRepository;
+import Data.MongoDB.mappers.*;
+import Data.MongoDB.repositories.MongoServiceRepository;
+import Data.MongoDB.repositories.MongoVehicleRepository;
 import Data.PostgreSQL.repositories.repositories.AppointmentRepositoryJpa;
 import Data.PostgreSQL.repositories.repositories.ClientRepositoryJpa;
 import Data.PostgreSQL.repositories.repositories.ServiceRepositoryJpa;
 import Data.PostgreSQL.repositories.repositories.VehicleRepositoryJpa;
+import com.mongodb.client.MongoDatabase;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import managers.*;
@@ -22,12 +28,18 @@ public class Main {
     static void main() {
 //        // Inicjalizacja repozytoriów
 
-          try (EntityManagerFactory emf = Persistence.createEntityManagerFactory("WarsztatPU")) {
-              ClientRepository clientRepo = new ClientRepositoryJpa(emf, new ClientMapper());
-              AppointmentRepository appointmentRepo = new AppointmentRepositoryJpa(emf,
-                      new AppointmentMapper(new ClientMapper(), new ServiceMapper(), new InvoiceMapper()));
-              ServiceRepository serviceRepo = new ServiceRepositoryJpa(emf, new ServiceMapper());
-              VehicleRepository vehicleRepo = new VehicleRepositoryJpa(emf, new VehicleMapper());
+          try (MongoConfig mongoConfig = 
+                       new MongoConfig("mongodb://mongo1:27017,mongo2:27018,mongo3:27019/" +
+                               "?replicaSet=rs0&retryWrites=true")) {
+              MongoDatabase database = mongoConfig.getDatabase();
+              
+              ClientRepository clientRepo = new MongoClientRepository(database, new ClientMapper());
+              AppointmentRepository appointmentRepo = new MongoAppointmentRepository(database,
+                      new AppointmentMapper(), new InvoiceMapper(), new ServiceMapper());
+
+              ServiceRepository serviceRepo = new MongoServiceRepository(database, new ServiceMapper());
+              VehicleRepository vehicleRepo = new MongoVehicleRepository(database, new VehicleMapper(),
+                                                                            new ClientMapper());
 
 
               // Harmonogram pracy
