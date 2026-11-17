@@ -8,7 +8,6 @@ import model.Client;
 import model.Vehicle;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import repositories.ClientRepository;
 import repositories.VehicleRepository;
@@ -42,21 +41,14 @@ public class MongoVehicleRepositoryTest {
         mongoConfig.close();
     }
 
-    @BeforeEach
-    void setUpClient() {
-        Client client = new Client("Jarosław", "Jarząbkowski", "12345678901",
-                "pasha@email.com", "123123123", "Gold");
-        clientRepository.save(client);
-    }
-
     @Test
     void createAndGetVehicleTest() {
-        Optional<Client> ownerOpt = clientRepository.findById("12345678901");
-        assertTrue(ownerOpt.isPresent());
-        Client owner = ownerOpt.get();
+        Client client = new Client("Robert", "Kubica", "44433322211",
+                "robert@email.com", "600700800", "Diamond");
+        clientRepository.save(client);
 
-        Vehicle car = new Car(owner, "VIN123456789", "EL12345", 2003,
-                "Audi", "A3", "Srebrny", 1600, 120, 1300,
+        Vehicle car = new Car(client, "VIN123456789", "EL12345", 2003,
+                "Audi", "A3", "Czerwony", 1600, 120, 1300,
                 "Cupe", "Benzyna", 3);
 
         vehicleRepository.save(car);
@@ -67,18 +59,36 @@ public class MongoVehicleRepositoryTest {
         assertEquals("Audi", vehicleFromMongo.get().getBrand());
         assertEquals("A3", vehicleFromMongo.get().getModel());
         assertNotNull(vehicleFromMongo.get().getOwner());
-        assertEquals("12345678901", vehicleFromMongo.get().getOwner().getPesel());
+        assertEquals("44433322211", vehicleFromMongo.get().getOwner().getPesel());
     }
 
     @Test
     void findByClientPeselTest() {
-        List<Vehicle> vehicles = vehicleRepository.findByClientPesel("12345678901");
+        Client client = new Client("Robert", "Kubica", "44433322211",
+                "robert@email.com", "600700800", "Diamond");
+        clientRepository.save(client);
+
+        Vehicle car = new Car(client, "VIN123456789", "EL12345", 2003,
+                "Audi", "A3", "Czerwony", 1600, 120, 1300,
+                "Cupe", "Benzyna", 3);
+        vehicleRepository.save(car);
+
+        List<Vehicle> vehicles = vehicleRepository.findByClientPesel("44433322211");
         assertFalse(vehicles.isEmpty());
-        assertEquals("12345678901", vehicles.get(0).getOwner().getPesel());
+        assertEquals("44433322211", vehicles.get(0).getOwner().getPesel());
     }
 
     @Test
     void findByRegistrationNumberTest() {
+        Client client = new Client("Robert", "Kubica", "44433322211",
+                "robert@email.com", "600700800", "Diamond");
+        clientRepository.save(client);
+
+        Vehicle car = new Car(client, "VIN123456789", "EL12345", 2003,
+                "Audi", "A3", "Czerwony", 1600, 120, 1300,
+                "Cupe", "Benzyna", 3);
+        vehicleRepository.save(car);
+
         List<Vehicle> vehicles = vehicleRepository.findByRegistrationNumber("EL12345");
         assertFalse(vehicles.isEmpty());
         assertEquals("VIN123456789", vehicles.get(0).getVinNumber());
@@ -86,12 +96,30 @@ public class MongoVehicleRepositoryTest {
 
     @Test
     void findByBrandAndModelTest() {
+        Client client = new Client("Robert", "Kubica", "44433322211",
+                "robert@email.com", "600700800", "Diamond");
+        clientRepository.save(client);
+
+        Vehicle car = new Car(client, "VIN123456789", "EL12345", 2003,
+                "Audi", "A3", "Czerwony", 1600, 120, 1300,
+                "Cupe", "Benzyna", 3);
+        vehicleRepository.save(car);
+
         List<Vehicle> vehicles = vehicleRepository.findByBrandAndModel("Audi", "A3");
         assertFalse(vehicles.isEmpty());
     }
 
     @Test
     void deleteVehicleTest() {
+        Client client = new Client("Robert", "Kubica", "44433322211",
+                "robert@email.com", "600700800", "Diamond");
+        clientRepository.save(client);
+
+        Vehicle car = new Car(client, "VIN123456789", "EL12345", 2003,
+                "Audi", "A3", "Czerwony", 1600, 120, 1300,
+                "Cupe", "Benzyna", 3);
+        vehicleRepository.save(car);
+
         vehicleRepository.deleteById("VIN123456789");
         Optional<Vehicle> vehicle = vehicleRepository.findById("VIN123456789");
         assertTrue(vehicle.isEmpty());

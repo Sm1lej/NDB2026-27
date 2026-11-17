@@ -184,17 +184,53 @@ public class MongoAppointmentRepository implements AppointmentRepository {
 
     @Override
     public List<Appointment> findByClientPesel(String clientPesel) {
-        return List.of();
+        List<AppointmentDocument> appointmentDocs = appointmentCollection.find(
+                Filters.eq("clientPesel", clientPesel)
+        ).into(new ArrayList<>());
+
+        List<Appointment> appointments = new ArrayList<>();
+        for (AppointmentDocument doc : appointmentDocs) {
+            findById(doc.getId()).ifPresent(appointments::add);
+        }
+        return appointments;
     }
 
     @Override
     public List<Appointment> findByDate(LocalDateTime date) {
-        return List.of();
+        java.util.Date startDate = java.util.Date.from(date.withNano(0).atZone(java.time.ZoneId.of("Europe/Warsaw")).toInstant());
+        java.util.Date endDate = java.util.Date.from(date.withNano(0).plusSeconds(1).atZone(java.time.ZoneId.of("Europe/Warsaw")).toInstant());
+
+        List<AppointmentDocument> appointmentDocs = appointmentCollection.find(
+                Filters.and(
+                        Filters.gte("date", startDate),
+                        Filters.lt("date", endDate)
+                )
+        ).into(new ArrayList<>());
+
+        List<Appointment> appointments = new ArrayList<>();
+        for (AppointmentDocument doc : appointmentDocs) {
+            findById(doc.getId()).ifPresent(appointments::add);
+        }
+        return appointments;
     }
 
     @Override
     public List<Appointment> findByDateRange(LocalDateTime from, LocalDateTime to) {
-        return List.of();
+        java.util.Date startDate = java.util.Date.from(from.atZone(java.time.ZoneId.of("Europe/Warsaw")).toInstant());
+        java.util.Date endDate = java.util.Date.from(to.atZone(java.time.ZoneId.of("Europe/Warsaw")).toInstant());
+
+        List<AppointmentDocument> appointmentDocs = appointmentCollection.find(
+                Filters.and(
+                        Filters.gte("date", startDate),
+                        Filters.lte("date", endDate)
+                )
+        ).into(new ArrayList<>());
+
+        List<Appointment> appointments = new ArrayList<>();
+        for (AppointmentDocument doc : appointmentDocs) {
+            findById(doc.getId()).ifPresent(appointments::add);
+        }
+        return appointments;
     }
 
     private Integer getNewId() {
