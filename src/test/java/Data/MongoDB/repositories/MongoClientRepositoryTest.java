@@ -36,7 +36,7 @@ class MongoClientRepositoryTest {
     @Test
     void createAndGetClient() {
         Client client = new Client("Cezary", "Pazura", "00000000001",
-                "email@email.com", "123123123", "Diamond");
+                "email0@email.com", "123123123", "Diamond");
 
         Client savedClient = clientRepository.save(client);
 
@@ -50,15 +50,13 @@ class MongoClientRepositoryTest {
 
     @Test
     void updateClientTest() {
-        Client client = new Client("Cezary", "Pazura", "00000000002",
-                "email@email.com", "123123123", "Diamond");
-
-        clientRepository.save(client);
+        Client client = new Client("Cezary", "Pazura", "00000000001",
+                "email0@email.com", "123123123", "Diamond");
 
         client.setClientType("Gold");
         clientRepository.save(client);
 
-        Optional<Client> clientFromMongo = clientRepository.findById("00000000002");
+        Optional<Client> clientFromMongo = clientRepository.findById(client.getPesel());
 
         assertTrue(clientFromMongo.isPresent());
         assertEquals("Gold", clientFromMongo.get().getClientType());
@@ -67,13 +65,12 @@ class MongoClientRepositoryTest {
 
     @Test
     void deleteClientByIdTest() {
-        Client client = new Client("Cezary", "Pazura", "00000000002",
-                "email@email.com", "123123123", "Diamond");
+        Client client = new Client("Cezary", "Pazura", "00000000001",
+                "email1@email.com", "123123123", "Diamond");
 
-        clientRepository.save(client);
         clientRepository.deleteById(client.getPesel());
 
-        Optional<Client> clientFromMongo = clientRepository.findById("00000000002");
+        Optional<Client> clientFromMongo = clientRepository.findById(client.getPesel());
 
         assertTrue(clientFromMongo.isPresent());
         assertTrue(clientFromMongo.get().isArchive());
@@ -82,8 +79,8 @@ class MongoClientRepositoryTest {
 
     @Test
     void findByNameAndLastName() {
-        Client client = new Client("Cezary", "Pazura", "00000000002",
-                "email@email.com", "123123123", "Diamond");
+        Client client = new Client("Tomek", "Atomek", "00000000002",
+                "email2@email.com", "123777123", "Diamond");
 
         clientRepository.save(client);
 
@@ -98,10 +95,9 @@ class MongoClientRepositoryTest {
 
     @Test
     void findByPhoneNumber() {
-        Client client = new Client("Cezary", "Pazura", "00000000002",
-                "email@email.com", "123456789", "Diamond");
+        Client client = new Client("Tomek", "Atomek", "00000000002",
+                "email2@email.com", "123777123", "Diamond");
 
-        clientRepository.save(client);
 
         List<Client> clientsFromMongo = clientRepository.findByPhoneNumber(client.getPhoneNumber());
 
@@ -111,7 +107,7 @@ class MongoClientRepositoryTest {
 
     @Test
     void findByArchive() {
-        Client client = new Client("Cezary", "Pazura", "00000000002",
+        Client client = new Client("Cezary", "Pazura", "00000000001",
                 "email@email.com", "123123123", "Diamond");
 
         client.setArchive(true);
@@ -120,7 +116,7 @@ class MongoClientRepositoryTest {
         List<Client> clientsFromMongo = clientRepository.findByArchive();
 
         assertFalse(clientsFromMongo.isEmpty());
-        assertEquals(clientsFromMongo.get(0).getPesel(), client.getPesel());
+        assertEquals(client.getPesel(), clientsFromMongo.get(0).getPesel());
     }
 
 }
