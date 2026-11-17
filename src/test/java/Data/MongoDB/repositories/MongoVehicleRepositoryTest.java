@@ -33,7 +33,12 @@ public class MongoVehicleRepositoryTest {
         clientRepository = new MongoClientRepository(mongoConfig.getDatabase(), clientMapper);
 
         VehicleMapper vehicleMapper = new VehicleMapper();
-        vehicleRepository = new MongoVehicleRepository(mongoConfig.getDatabase(), vehicleMapper, clientRepository);
+
+        vehicleRepository = new MongoVehicleRepository(
+                mongoConfig.getDatabase(),
+                vehicleMapper,
+                clientMapper
+        );
     }
 
     @AfterAll

@@ -1,6 +1,8 @@
 package Data.MongoDB.repositories;
 
+import Data.MongoDB.documents.ClientDocument;
 import Data.MongoDB.documents.VehicleDocument;
+import Data.MongoDB.mappers.ClientMapper;
 import Data.MongoDB.mappers.VehicleMapper;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
@@ -8,7 +10,6 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.ReplaceOptions;
 import model.Client;
 import model.Vehicle;
-import repositories.ClientRepository;
 import repositories.VehicleRepository;
 
 import java.util.ArrayList;
@@ -20,20 +21,26 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class MongoVehicleRepository implements VehicleRepository {
 
-    private final MongoCollection<VehicleDocument> collection;
+    private final MongoCollection<VehicleDocument> vehicleCollection;
+    private final MongoCollection<ClientDocument> clientCollection;
     private final VehicleMapper vehicleMapper;
-    private final ClientRepository clientRepository;
+    private final ClientMapper clientMapper;
 
     public MongoVehicleRepository(MongoDatabase database,
                                   VehicleMapper vehicleMapper,
-                                  ClientRepository clientRepository) {
-        this.collection = database.getCollection(
+                                  ClientMapper clientMapper) {
+        this.vehicleCollection = database.getCollection(
                 "vehicles",
                 VehicleDocument.class
         ).withWriteConcern(WriteConcern.MAJORITY);
 
+        this.clientCollection = database.getCollection(
+                "clients",
+                ClientDocument.class
+        ).withWriteConcern(WriteConcern.MAJORITY);
+
         this.vehicleMapper = vehicleMapper;
-        this.clientRepository = clientRepository;
+        this.clientMapper = clientMapper;
     }
 
     @Override
@@ -42,15 +49,20 @@ public class MongoVehicleRepository implements VehicleRepository {
             throw new IllegalArgumentException("Pojazd nie może być nullem");
         }
         if (vehicle.getOwner() != null) {
-            clientRepository.findById(vehicle.getOwner().getPesel())
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Nie można zapisać pojazdu. Właściciel o numerze PESEL "
-                                    + vehicle.getOwner().getPesel() + " nie istnieje."
-                    ));
+            ClientDocument clientDoc = clientCollection.find(
+                    eq("_id", vehicle.getOwner().getPesel())
+            ).first();
+
+            if (clientDoc == null) {
+                throw new IllegalArgumentException(
+                        "Nie można zapisać pojazdu. Właściciel o numerze PESEL "
+                                + vehicle.getOwner().getPesel() + " nie istnieje."
+                );
+            }
         }
         VehicleDocument document = vehicleMapper.toDocument(vehicle);
 
-        collection.replaceOne(
+        vehicleCollection.replaceOne(
                 eq("_id", document.getVinNumber()),
                 document,
                 new ReplaceOptions().upsert(true)
@@ -61,110 +73,99 @@ public class MongoVehicleRepository implements VehicleRepository {
 
     @Override
     public Optional<Vehicle> findById(String id) {
-        VehicleDocument doc = collection.find(eq("_id", id)).first();
+        VehicleDocument doc = vehicleCollection.find(eq("_id", id)).first();
         if (doc == null) {
             return Optional.empty();
         }
 
-        Client owner = doc.getOwnerPesel() != null
-                ? clientRepository.findById(doc.getOwnerPesel()).orElse(null)
-                : null;
+        Client owner = null;
+        if (doc.getOwnerPesel() != null) {
+            ClientDocument clientDoc = clientCollection.find(eq("_id", doc.getOwnerPesel())).first();
+            if (clientDoc != null) {
+                owner = clientMapper.toDomain(clientDoc);
+            }
+        }
 
         return Optional.of(vehicleMapper.toDomain(doc, owner));
     }
 
     @Override
     public List<Vehicle> findAll() {
-        List<VehicleDocument> documents = collection.find().into(new ArrayList<>());
+        List<VehicleDocument> documents = vehicleCollection.find().into(new ArrayList<>());
 
-        return documents.stream()
-                .map(doc -> {
-                    Client owner = doc.getOwnerPesel() != null
-                            ? clientRepository.findById(doc.getOwnerPesel()).orElse(null)
-                            : null;
-                    return vehicleMapper.toDomain(doc, owner);
-                })
-                .toList();
+        List<Vehicle> vehicles = new ArrayList<>();
+        for (VehicleDocument doc : documents) {
+            findById(doc.getVinNumber()).ifPresent(vehicles::add);
+        }
+        return vehicles;
     }
 
     @Override
     public List<Vehicle> findByClientPesel(String clientPesel) {
-        Client owner = clientRepository.findById(clientPesel).orElse(null);
-
-        List<VehicleDocument> documents = collection.find(eq("ownerPesel", clientPesel))
+        List<VehicleDocument> documents = vehicleCollection.find(eq("ownerPesel", clientPesel))
                 .into(new ArrayList<>());
 
-        return documents.stream()
-                .map(doc -> vehicleMapper.toDomain(doc, owner))
-                .toList();
+        List<Vehicle> vehicles = new ArrayList<>();
+        for (VehicleDocument doc : documents) {
+            findById(doc.getVinNumber()).ifPresent(vehicles::add);
+        }
+        return vehicles;
     }
 
     @Override
     public List<Vehicle> findByVinNumber(String vinNumber) {
-        List<VehicleDocument> documents = collection.find(eq("_id", vinNumber))
+        List<VehicleDocument> documents = vehicleCollection.find(eq("_id", vinNumber))
                 .into(new ArrayList<>());
 
-        return documents.stream()
-                .map(doc -> {
-                    Client owner = doc.getOwnerPesel() != null
-                            ? clientRepository.findById(doc.getOwnerPesel()).orElse(null)
-                            : null;
-                    return vehicleMapper.toDomain(doc, owner);
-                })
-                .toList();
+        List<Vehicle> vehicles = new ArrayList<>();
+        for (VehicleDocument doc : documents) {
+            findById(doc.getVinNumber()).ifPresent(vehicles::add);
+        }
+        return vehicles;
     }
 
     @Override
     public List<Vehicle> findByRegistrationNumber(String registrationNumber) {
-        List<VehicleDocument> documents = collection.find(eq("registrationNumber", registrationNumber))
+        List<VehicleDocument> documents = vehicleCollection.find(eq("registrationNumber", registrationNumber))
                 .into(new ArrayList<>());
 
-        return documents.stream()
-                .map(doc -> {
-                    Client owner = doc.getOwnerPesel() != null
-                            ? clientRepository.findById(doc.getOwnerPesel()).orElse(null)
-                            : null;
-                    return vehicleMapper.toDomain(doc, owner);
-                })
-                .toList();
+        List<Vehicle> vehicles = new ArrayList<>();
+        for (VehicleDocument doc : documents) {
+            findById(doc.getVinNumber()).ifPresent(vehicles::add);
+        }
+        return vehicles;
     }
 
     @Override
     public List<Vehicle> findByBrandAndModel(String brand, String model) {
-        List<VehicleDocument> documents = collection.find(and(
+        List<VehicleDocument> documents = vehicleCollection.find(and(
                         eq("brand", brand),
                         eq("model", model)
                 ))
                 .into(new ArrayList<>());
 
-        return documents.stream()
-                .map(doc -> {
-                    Client owner = doc.getOwnerPesel() != null
-                            ? clientRepository.findById(doc.getOwnerPesel()).orElse(null)
-                            : null;
-                    return vehicleMapper.toDomain(doc, owner);
-                })
-                .toList();
+        List<Vehicle> vehicles = new ArrayList<>();
+        for (VehicleDocument doc : documents) {
+            findById(doc.getVinNumber()).ifPresent(vehicles::add);
+        }
+        return vehicles;
     }
 
     @Override
     public List<Vehicle> findByEngineDisplacement(double engineDisplacement) {
-        List<VehicleDocument> documents = collection.find(eq("engineDisplacement", engineDisplacement))
+        List<VehicleDocument> documents = vehicleCollection.find(eq("engineDisplacement", engineDisplacement))
                 .into(new ArrayList<>());
 
-        return documents.stream()
-                .map(doc -> {
-                    Client owner = doc.getOwnerPesel() != null
-                            ? clientRepository.findById(doc.getOwnerPesel()).orElse(null)
-                            : null;
-                    return vehicleMapper.toDomain(doc, owner);
-                })
-                .toList();
+        List<Vehicle> vehicles = new ArrayList<>();
+        for (VehicleDocument doc : documents) {
+            findById(doc.getVinNumber()).ifPresent(vehicles::add);
+        }
+        return vehicles;
     }
 
     @Override
     public void deleteById(String id) {
-        long deletedCount = collection.deleteOne(eq("_id", id))
+        long deletedCount = vehicleCollection.deleteOne(eq("_id", id))
                 .getDeletedCount();
 
         if (deletedCount == 0) {
