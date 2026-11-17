@@ -33,7 +33,7 @@ public class MongoConfig implements AutoCloseable {
         mongoClient = MongoClients.create(connectionString);
 
         database = mongoClient
-                .getDatabase("workshop")
+                .getDatabase("warsztat_samochodowy")
                 .withCodecRegistry(codecRegistry);
     }
 

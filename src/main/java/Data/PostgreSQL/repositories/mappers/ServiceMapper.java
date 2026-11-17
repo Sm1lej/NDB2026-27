@@ -1,8 +1,8 @@
-package Data.PostgreSQL.mappers;
+package Data.PostgreSQL.repositories.mappers;
 
-import Data.PostgreSQL.entity.DiagnosticServiceEnt;
-import Data.PostgreSQL.entity.RepairServiceEnt;
-import Data.PostgreSQL.entity.ServiceEnt;
+import Data.PostgreSQL.repositories.entity.DiagnosticServiceEnt;
+import Data.PostgreSQL.repositories.entity.RepairServiceEnt;
+import Data.PostgreSQL.repositories.entity.ServiceEnt;
 import model.DiagnosticService;
 import model.RepairService;
 import model.Service;

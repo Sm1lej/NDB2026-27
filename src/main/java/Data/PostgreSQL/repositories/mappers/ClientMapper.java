@@ -1,7 +1,7 @@
-package Data.PostgreSQL.mappers;
+package Data.PostgreSQL.repositories.mappers;
 
 import model.Client;
-import Data.PostgreSQL.entity.ClientEnt;
+import Data.PostgreSQL.repositories.entity.ClientEnt;
 
 public class ClientMapper {
     public Client toDomain(ClientEnt clientEnt) {

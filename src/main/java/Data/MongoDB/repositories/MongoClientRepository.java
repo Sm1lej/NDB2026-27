@@ -2,6 +2,7 @@ package Data.MongoDB.repositories;
 
 import Data.MongoDB.documents.ClientDocument;
 import Data.MongoDB.mappers.ClientMapper;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -24,7 +25,7 @@ public class MongoClientRepository implements ClientRepository {
         collection = database.getCollection(
                 "clients",
                 ClientDocument.class
-        );
+        ).withWriteConcern(WriteConcern.MAJORITY);
 
         this.clientMapper = clientMapper;
     }
@@ -60,7 +61,7 @@ public class MongoClientRepository implements ClientRepository {
     @Override
     public void deleteById(String pesel) {
         UpdateResult result = collection.updateOne(Filters.eq("_id", pesel),
-                Updates.set("isArchive", true));
+                Updates.set("archive", true));
 
         if (result.getMatchedCount() == 0) {
             throw new IllegalArgumentException(
@@ -71,8 +72,10 @@ public class MongoClientRepository implements ClientRepository {
     @Override
     public List<Client> findByNameAndLastName(String name, String lastName) {
         List<ClientDocument> clientDoc =
-                collection.find(Filters.and(Filters.eq("name", name),
-                                Filters.eq("lastName", lastName)))
+                collection.find(Filters.and(
+                                Filters.eq("name", name),
+                                Filters.eq("lastName", lastName))
+                        )
                         .into(new ArrayList<>());
 
         return clientDoc.stream()
@@ -94,7 +97,7 @@ public class MongoClientRepository implements ClientRepository {
     @Override
     public List<Client> findByArchive() {
         List<ClientDocument> clientDoc =
-                collection.find(Filters.eq("isArchive", true))
+                collection.find(Filters.eq("archive", true))
                         .into(new ArrayList<>());
 
         return clientDoc

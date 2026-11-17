@@ -11,7 +11,7 @@ public class ClientMapper {
 
         Client client = new Client(
                 clientDoc.getName(),
-                clientDoc.getLastname(),
+                clientDoc.getLastName(),
                 clientDoc.getPesel(),
                 clientDoc.getEmail(),
                 clientDoc.getPhoneNumber(),
@@ -32,7 +32,7 @@ public class ClientMapper {
 
         clientDoc.setPesel(client.getPesel());
         clientDoc.setName(client.getName());
-        clientDoc.setLastname(client.getLastName());
+        clientDoc.setLastName(client.getLastName());
         clientDoc.setEmail(client.getEmail());
         clientDoc.setPhoneNumber(client.getPhoneNumber());
         clientDoc.setClientType(client.getClientType());

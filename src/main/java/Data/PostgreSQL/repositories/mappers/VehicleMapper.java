@@ -1,9 +1,9 @@
-package Data.PostgreSQL.mappers;
+package Data.PostgreSQL.repositories.mappers;
 
-import Data.PostgreSQL.entity.CarEnt;
-import Data.PostgreSQL.entity.ClientEnt;
-import Data.PostgreSQL.entity.MotorbikeEnt;
-import Data.PostgreSQL.entity.VehicleEnt;
+import Data.PostgreSQL.repositories.entity.CarEnt;
+import Data.PostgreSQL.repositories.entity.ClientEnt;
+import Data.PostgreSQL.repositories.entity.MotorbikeEnt;
+import Data.PostgreSQL.repositories.entity.VehicleEnt;
 import model.Vehicle;
 import model.Motorbike;
 import model.Car;

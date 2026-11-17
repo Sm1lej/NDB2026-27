@@ -6,6 +6,7 @@ import Data.MongoDB.documents.ServiceDocument;
 import Data.MongoDB.mappers.AppointmentMapper;
 import Data.MongoDB.mappers.InvoiceMapper;
 import Data.MongoDB.mappers.ServiceMapper;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
@@ -38,22 +39,23 @@ public class MongoAppointmentRepository implements AppointmentRepository {
         appointmentCollection = database.getCollection(
                 "appointments",
                 AppointmentDocument.class
-        );
+
+        ).withWriteConcern(WriteConcern.MAJORITY);
 
         serviceCollection = database.getCollection(
                 "services",
                 ServiceDocument.class
-        );
+        ).withWriteConcern(WriteConcern.MAJORITY);
 
         clientCollection = database.getCollection(
                 "clients",
                 ClientDocument.class
-        );
+        ).withWriteConcern(WriteConcern.MAJORITY);
 
         counters = database.getCollection(
                 "counters",
                 Document.class
-        );
+        ).withWriteConcern(WriteConcern.MAJORITY);
 
         this.appointmentMapper = appointmentMapper;
         this.invoiceMapper = invoiceMapper;
@@ -170,8 +172,14 @@ public class MongoAppointmentRepository implements AppointmentRepository {
     }
 
     @Override
-    public void deleteById(Integer integer) {
+    public void deleteById(Integer id) {
+        long deletedCount = appointmentCollection.deleteOne(
+                Filters.eq("_id", id)
+        ).getDeletedCount();
 
+        if (deletedCount == 0) {
+            throw new IllegalArgumentException("Wizyta o podanym id nie istnieje!");
+        }
     }
 
     @Override

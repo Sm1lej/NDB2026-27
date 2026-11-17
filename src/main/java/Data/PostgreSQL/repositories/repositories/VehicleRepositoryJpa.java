@@ -1,10 +1,10 @@
-package Data.PostgreSQL.repositories;
+package Data.PostgreSQL.repositories.repositories;
 
-import Data.PostgreSQL.entity.ClientEnt;
-import Data.PostgreSQL.entity.CarEnt;
-import Data.PostgreSQL.entity.MotorbikeEnt;
-import Data.PostgreSQL.entity.VehicleEnt;
-import Data.PostgreSQL.mappers.VehicleMapper;
+import Data.PostgreSQL.repositories.entity.ClientEnt;
+import Data.PostgreSQL.repositories.entity.CarEnt;
+import Data.PostgreSQL.repositories.entity.MotorbikeEnt;
+import Data.PostgreSQL.repositories.entity.VehicleEnt;
+import Data.PostgreSQL.repositories.mappers.VehicleMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;

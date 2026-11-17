@@ -7,15 +7,15 @@
     <persistence-unit name="WarsztatPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <class>Data.PostgreSQL.entity.ClientEnt</class>
-        <class>Data.PostgreSQL.entity.VehicleEnt</class>
-        <class>Data.PostgreSQL.entity.CarEnt</class>
-        <class>Data.PostgreSQL.entity.MotorbikeEnt</class>
-        <class>Data.PostgreSQL.entity.ServiceEnt</class>
-        <class>Data.PostgreSQL.entity.AppointmentEnt</class>
-        <class>Data.PostgreSQL.entity.InvoiceEnt</class>
-        <class>Data.PostgreSQL.entity.RepairServiceEnt</class>
-        <class>Data.PostgreSQL.entity.DiagnosticServiceEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.ClientEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.VehicleEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.CarEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.MotorbikeEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.ServiceEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.AppointmentEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.InvoiceEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.RepairServiceEnt</class>
+        <class>Data.PostgreSQL.repositories.entity.DiagnosticServiceEnt</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>NONE</shared-cache-mode>

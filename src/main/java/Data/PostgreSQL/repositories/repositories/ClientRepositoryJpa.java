@@ -1,7 +1,7 @@
-package Data.PostgreSQL.repositories;
+package Data.PostgreSQL.repositories.repositories;
 
-import Data.PostgreSQL.entity.ClientEnt;
-import Data.PostgreSQL.mappers.ClientMapper;
+import Data.PostgreSQL.repositories.entity.ClientEnt;
+import Data.PostgreSQL.repositories.mappers.ClientMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;

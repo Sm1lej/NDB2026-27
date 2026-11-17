@@ -1,10 +1,10 @@
-package Data.PostgreSQL.repositories;
+package Data.PostgreSQL.repositories.repositories;
 
-import Data.PostgreSQL.entity.AppointmentEnt;
-import Data.PostgreSQL.entity.ClientEnt;
-import Data.PostgreSQL.entity.InvoiceEnt;
-import Data.PostgreSQL.entity.ServiceEnt;
-import Data.PostgreSQL.mappers.AppointmentMapper;
+import Data.PostgreSQL.repositories.entity.AppointmentEnt;
+import Data.PostgreSQL.repositories.entity.ClientEnt;
+import Data.PostgreSQL.repositories.entity.InvoiceEnt;
+import Data.PostgreSQL.repositories.entity.ServiceEnt;
+import Data.PostgreSQL.repositories.mappers.AppointmentMapper;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;

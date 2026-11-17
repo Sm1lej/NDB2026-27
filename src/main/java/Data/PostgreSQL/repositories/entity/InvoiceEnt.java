@@ -1,4 +1,4 @@
-package Data.PostgreSQL.entity;
+package Data.PostgreSQL.repositories.entity;
 
 import jakarta.persistence.*;
 

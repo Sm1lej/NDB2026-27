@@ -1,8 +1,8 @@
-package Data.PostgreSQL.mappers;
+package Data.PostgreSQL.repositories.mappers;
 
-import Data.PostgreSQL.entity.AppointmentEnt;
-import Data.PostgreSQL.entity.ClientEnt;
-import Data.PostgreSQL.entity.ServiceEnt;
+import Data.PostgreSQL.repositories.entity.AppointmentEnt;
+import Data.PostgreSQL.repositories.entity.ClientEnt;
+import Data.PostgreSQL.repositories.entity.ServiceEnt;
 
 import model.Appointment;
 import model.Client;

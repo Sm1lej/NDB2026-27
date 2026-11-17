@@ -1,7 +1,7 @@
-package Data.PostgreSQL.mappers;
+package Data.PostgreSQL.repositories.mappers;
 
-import Data.PostgreSQL.entity.AppointmentEnt;
-import Data.PostgreSQL.entity.InvoiceEnt;
+import Data.PostgreSQL.repositories.entity.AppointmentEnt;
+import Data.PostgreSQL.repositories.entity.InvoiceEnt;
 import model.Appointment;
 import model.Invoice;
 

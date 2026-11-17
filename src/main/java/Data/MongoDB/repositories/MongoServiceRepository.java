@@ -2,6 +2,7 @@ package Data.MongoDB.repositories;
 
 import Data.MongoDB.documents.ServiceDocument;
 import Data.MongoDB.mappers.ServiceMapper;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
@@ -26,12 +27,12 @@ public class MongoServiceRepository implements ServiceRepository {
         this.collection = database.getCollection(
                 "services",
                 ServiceDocument.class
-        );
+        ).withWriteConcern(WriteConcern.MAJORITY);
 
         this.counters = database.getCollection(
                 "counters",
                 Document.class
-        );
+        ).withWriteConcern(WriteConcern.MAJORITY);
 
         this.serviceMapper = serviceMapper;
     }

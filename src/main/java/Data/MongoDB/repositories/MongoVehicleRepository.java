@@ -2,6 +2,7 @@ package Data.MongoDB.repositories;
 
 import Data.MongoDB.documents.VehicleDocument;
 import Data.MongoDB.mappers.VehicleMapper;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.ReplaceOptions;
@@ -29,7 +30,8 @@ public class MongoVehicleRepository implements VehicleRepository {
         this.collection = database.getCollection(
                 "vehicles",
                 VehicleDocument.class
-        );
+        ).withWriteConcern(WriteConcern.MAJORITY);
+
         this.vehicleMapper = vehicleMapper;
         this.clientRepository = clientRepository;
     }
@@ -39,7 +41,7 @@ public class MongoVehicleRepository implements VehicleRepository {
         if (vehicle == null) {
             throw new IllegalArgumentException("Pojazd nie może być nullem");
         }
-
+        // brakuje sprawdzania właściciela
         VehicleDocument document = vehicleMapper.toDocument(vehicle);
 
         collection.replaceOne(
